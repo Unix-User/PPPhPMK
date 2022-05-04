@@ -1,0 +1,66 @@
+<?php $this->renderView('alerts/_success'); ?>
+<?php $this->renderView('alerts/_errors'); ?>
+<header class="major">
+    <h2><?php echo $this->getPageTitle(); ?></h2>
+    <p>Essa é a página de gerenciamento. Aqui voce pode visualizar, selecionar cadastrar ou deletar usuários</p>
+</header>
+<section>
+    <div class="table-wrapper">Usuários: <br />
+        <table class="alt">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>usuário</th>
+                    <th>telefone</th>
+                    <th class="hidden-xs">email</th>
+                    <th class="hidden-xs">plano</th>
+                    <th class="hidden-xs">vencimento</th>
+                    <th class="text-right">
+                        <?php if ($this->auth->check() && $this->auth->admin()) : ?>
+                            <a href="/user/create" class="icon fa-plus special"></a>
+                        <?php endif; ?>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->users as $user) : ?>
+                    <?php if ($user->owner->id == $this->auth->id()) : ?>
+                        <tr>
+                            <th><a class="clean" href="/user/<?php echo $user->id; ?>/show"><?php echo $user->id; ?></a></th>
+                            <th><a class="clean" href="/user/<?php echo $user->id; ?>/show"><?php echo $user->name; ?></a></th>
+                            <th class="clean"><a target="_new" href="https://wa.me/55<?php echo $user->phone; ?>" class="icon alt fa-whatsapp"><span class="label">Whatsapp</span></a> <?php echo $user->phone; ?></th>
+                            <th class="hidden-xs"><a href="mailto:<?php echo $user->email; ?>" class="icon alt fa-envelope"><span class="label">Email</span></a> <?php echo $user->email; ?></th>
+                            <th class="hidden-xs">
+                                <?php foreach ($user->category as $cat) : ?>
+                                    <?php echo $cat->product; ?>
+                                    <?php echo "R$" . number_format($cat->value, 2, '.', ''); ?>
+                                <?php endforeach; ?>
+                            </th>
+                            <?php
+                            $expires = strtotime($user->expires);
+                            $disable = strtotime('+15 days', $expires);
+                            if ($expires < strtotime(date('Y-m-d'))) {
+                                $color = 'yellow';
+                                if (strtotime(date('Y-m-d')) >= strtotime('+15 days', $expires)) {
+                                    $color = 'maroon';
+                                }
+                            } else {
+                                $color = 'green';
+                            }
+                            ?>
+                            <th class="hidden-xs" style="color: <?php echo $color ?>;">
+                                <?php echo ($user->expires == null || $user->expires == '0000-00-00') ? 'N/A' : date('d-m-Y', strtotime($user->expires)); ?></th>
+                            <th class="text-right">
+                                <?php if ($this->auth->check() && $this->auth->admin()) : ?>
+                                    <a href="/user/<?php echo $user->id ?>/delete" class="icon fa-trash " onclick="return confirm('Deletar esse cadastro no sistema? Não sera mais possivel fazer login com esse usuário e todos os dados serão perdidos!')"></a>
+                                <?php else : ?>
+                                    <span class="icon fa-trash "></span>
+                                <?php endif; ?>
+                            </th>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</section>

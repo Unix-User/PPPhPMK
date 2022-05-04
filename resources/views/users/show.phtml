@@ -1,0 +1,337 @@
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<?php
+$conf = include __DIR__ . '/../../database.php';
+$cred = $this->view->credential;
+if ($cred->mode == 'prod') {
+    $token = $cred->access_token;
+} else if ($cred->mode == 'test') {
+    $token = $cred->test_access_token;
+}
+
+// SDK de Mercado Pago
+require __DIR__ . '/../../../vendor/autoload.php';
+
+// Configura credenciais
+MercadoPago\SDK::setAccessToken($token);
+
+$active = 0;
+$expired = 0;
+$blocked = 0;
+$billing = 0;
+$future = 0;
+$debt = 0;
+
+foreach ($this->view->users as $client) {
+    if (($client->owner->id == $this->auth->id()) && ($client->id != $this->auth->id())) {
+        $expires = strtotime($client->expires);
+        $disable = strtotime('+5 days', $expires);
+        if ($expires < strtotime(date('Y-m-d'))) {
+            if (strtotime(date('Y-m-d')) >= strtotime('+5 days', $expires)) {
+                $blocked++;
+                foreach ($client->category as $cat) {
+                    $debt = $debt + $cat->value;
+                }
+            } else {
+                $expired++;
+                foreach ($client->category as $cat) {
+                    $future = $future + $cat->value;
+                }
+            }
+        } else {
+            foreach ($client->category as $cat) {
+                $billing = $billing + $cat->value;
+            }
+            $active++;
+        }
+    }
+}
+?>
+<header class="major">
+    <h2>Bem vindo <span class="text-capitalize"><?php echo $this->view->user->name ?></span></h2>
+    <p>Use essa página para obter informações sobre seu usuário e serviços contratados</p>
+</header>
+<?php $this->renderView('alerts/_success'); ?>
+<?php $this->renderView('alerts/_errors'); ?>
+<?php $user = $this->view->user; ?>
+
+<!-- Content -->
+<div class="card-deck">
+    <?php if ($this->view->user->owner->name == $this->view->user->name) : ?>
+        <div class="card col-sm-4 bg-custom">
+            <div>
+                <div class="card-header">
+                    <span class="icon alt fa-user-plus"></span>
+                    <span class="card-title"><strong> Administrador</strong></span>
+                </div>
+            </div>
+        </div>
+    <?php else : ?>
+        <?php foreach ($user->category as $cat) : ?>
+            <?php
+
+            // Cria um objeto de preferência
+            $preference = new MercadoPago\Preference();
+            $preference->payment_methods = array(
+                "installments" => 1
+            );
+            // Cria um item na preferência
+            $item = new MercadoPago\Item();
+            $item->id = $cat->id;
+            $item->title = $cat->product;
+            $item->description = $cat->product;
+            $item->quantity = 1;
+            $item->unit_price = number_format($cat->value, 2, '.', '');
+            $preference->items = array($item);
+            $payer = new MercadoPago\Payer();
+            $payer->email = $this->view->user->email;
+            $payer->name = $this->view->user->name;/*
+            $payer->identification = array(
+                "type" => "CPF",
+                "number" => "10722042078"
+            );*/
+            $preference->back_urls = array(
+                "success" => "https://unixlocal.ml/processar_pagamento?manager=" . $this->view->user->owner->name,
+                "failure" => "https://unixlocal.ml/processar_pagamento?manager=" . $this->view->user->owner->name,
+                "pending" => "https://unixlocal.ml/processar_pagamento?manager=" . $this->view->user->owner->name
+            );
+            $preference->auto_return = "approved";
+            $preference->payer = $payer;
+            $preference->external_reference = $this->view->user->id;
+            $preference->statement_descriptor = "unixlocal.ml";
+            $preference->save();
+            ?>
+            <div class="card col-sm-4 bg-custom">
+                <div class="card-header">
+                    <span class="icon alt fa-wifi"></span>
+                    <span class="text-capitalize"><strong> <?php echo $cat->product; ?></strong>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><?php echo $cat->description; ?><br />
+                        O pagamento será processado pelo Mercado Pago, nenhuma informação alem da nescessária para a liberação no sistema sera registrada. Confira os dados antes de efetuar o pagamento, voce recebera em seu email o comprovante ao termino da transação.
+                    <ul>
+                        <li><strong>Tec. Responsavel: </strong><?php echo $this->view->user->owner->name; ?></li>
+                        <li><strong>Vencimento: </strong><?php echo (($this->view->user->owner->name == $this->view->user->name) ? 'Indefinido' : (($this->view->user->expires == null || $this->view->user->expires == '0000-00-00') ? '30 dias após pagamento da fatura' : date('d-m-Y', strtotime($this->view->user->expires)))); ?></li>
+                        <li><strong>Valor: </strong><?php echo " R$" . $cat->value; ?></li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <ul class="actions">
+                        <li>
+                            <script src="https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js" data-elements-color="#8e44ad" data-preference-id="<?php echo $preference->id; ?>">
+                            </script>
+                        </li>
+                        <?php if ($this->view->user->id == $this->auth->id()) : ?>
+                            <li>
+                                <a href="/products" class="button special small">Mudar</a>
+                            </li>
+                        <?php else : ?>
+                            <li>
+                                <a href="/support" class="button special small">Tickets</a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    <div class="card col-sm-8 bg-custom">
+        <div class="card-header">
+            <span class="icon alt fa-user"></span>
+            <strong class="text-capitalize"> <?php echo $this->view->user->name; ?></strong>
+        </div>
+        <div class="card-body">
+
+            <p class="card-text">
+            <form action="/processar_pagamento" method="POST">
+                <ul>
+                    <li><strong>Email: </strong><?php echo $this->view->user->email; ?></li>
+                    <li><strong>Telefone: </strong><?php echo $this->view->user->phone; ?></li>
+                    <li><strong>CEP: </strong><?php echo $this->view->user->cep; ?></li>
+                    <li><strong>Rua: </strong><?php echo $this->view->user->rua; ?></li>
+                    <li><strong>Bairro: </strong><?php echo $this->view->user->bairro; ?></li>
+                    <li><strong>Cidade: </strong><?php echo $this->view->user->cidade; ?></li>
+                    <li><strong>Estado: </strong><?php echo $this->view->user->uf; ?></li>
+                    <li><strong>Nº: </strong><?php echo $this->view->user->num; ?></li>
+                </ul>
+            </form>
+            </p>
+        </div>
+        <div class="card-footer">
+            <ul class="actions">
+                <li><a href="/user/<?php echo $user->id ?>/edit" class="button special small">Editar</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+<hr />
+<div class="card-deck">
+    <?php if ($this->view->user->owner->name == $this->view->user->name) : ?>
+        <div class="card col-sm-4 bg-custom">
+            <div class="card-header">
+                <span class="icon alt fa-money-alt"></span>
+                <strong class="text-capitalize"> Faturamento estimado</strong>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Essa é a estimativa calculada de acordo com os registros feitos no banco de dados.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-custom">Recebido: <?php echo 'R$ ' . $billing; ?></li>
+                <li class="list-group-item bg-custom">A receber: <?php echo 'R$ ' . $future; ?></li>
+                <li class="list-group-item bg-custom">Em Atraso: <?php echo 'R$ ' . $debt; ?></li>
+            </ul>
+        </div>
+    <?php else : ?>
+        <div class="card col-sm-4 bg-custom">
+            <div class="card-header">
+                <span class="icon alt fa-history"></span>
+                <strong class="text-capitalize"> Registros de atividade</strong>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Os dados podem demorar até 10 minutos para serem atualizados com o servidor.</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-custom">Ultimos registros</li>
+            </ul>
+        </div>
+    <?php endif; ?>
+    <div class="card col-sm-8 bg-custom">
+
+        <?php if ($this->view->user->owner->name == $this->view->user->name) : ?>
+            <div class="card-header">
+                <span class="icon alt fa-chart-pie"></span>
+                <strong class="text-capitalize"> Status de clientes</strong>
+            </div>
+            <div class="card-body">
+                <div id="piechart" style="width: 100%; height: auto;"></div>
+            </div>
+        <?php else : ?>
+            <div class="card-header">
+                <span class="icon alt fa-chart-bar"></span>
+                <strong class="text-capitalize"> Graficos de consumo</strong>
+            </div>
+            <div class="card-body">
+                <div id="linhas" style="width: 100%; height: auto;"></div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+    $(function() {
+        $('#nav-profile-tab').tab('show')
+    })
+</script>
+<?php if ($this->view->user->owner->name == $this->view->user->name) : ?>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {
+            'packages': ['corechart']
+        });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            var clients = google.visualization.arrayToDataTable([
+                ['Task', 'Hours per Day'],
+                ['Ativos', <?php echo $active; ?>],
+                ['Expirados', <?php echo $expired; ?>],
+                ['Bloqueados', <?php echo $blocked; ?>]
+            ]);
+
+            var options = {
+                title: 'Relatrio dos clientes',
+                titleTextStyle: {
+                    bold: true,
+                    // The color of the text.
+                    color: 'white'
+                },
+                legend: {
+                    position: 'bottom',
+                    textStyle: {
+                        bold: true,
+                        // The color of the text.
+                        color: 'white'
+                    }
+                },
+                backgroundColor: {
+                    fill: 'transparent'
+                }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+            chart.draw(clients, options);
+        }
+    </script>
+
+<?php else : ?>
+    <?php $usage = $this->view->usage; ?>
+    <!-- Carregar a API do google -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <!-- Preparar a geracao do grafico -->
+    <script type="text/javascript">
+        google.load("visualization", "1", {
+            packages: ["corechart"]
+        });
+        google.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            //montando o array com os dados
+            var data = google.visualization.arrayToDataTable([
+                ['Periodo', 'Upload(Gbs)', 'Download(Gbs)'],
+                <?php foreach ($this->view->usage as $data) : ?>
+                    <?php if ($data->owner_id == $this->view->user->id) : ?>
+                        <?php echo "['$data->month', " . number_format($data->GB_in, 2) . ", " . number_format($data->GB_out, 2) . "],"; ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+
+            ]);
+            //opções para o gráfico linhas
+            var options1 = {
+                title: 'Média de consumo de dados - Estimativa mensal',
+                titleTextStyle: {
+                    bold: true,
+                    // The color of the text.
+                    color: 'white'
+                },
+                legend: {
+                    textStyle: {
+                        bold: true,
+                        // The color of the text.
+                        color: 'white'
+                    }
+                },
+                backgroundColor: {
+                    fill: 'transparent'
+                },
+                vAxis: {
+                    textStyle: {
+                        bold: true,
+                        // The color of the text.
+                        color: 'white'
+                    }
+                },
+                hAxis: {
+                    title: 'Os dados são atualizados periodicamente(aproximadamente 30min)',
+                    titleTextStyle: {
+                        color: 'white'
+                    },
+                    textStyle: {
+                        bold: true,
+                        // The color of the text.
+                        color: 'white'
+                    }
+                } //legenda na horizontal
+            };
+            //instanciando e desenhando o gráfico linhas
+            var linhas = new google.visualization.ColumnChart(document.getElementById('linhas'));
+            linhas.draw(data, options1);
+
+        }
+    </script>
+<?php endif; ?>

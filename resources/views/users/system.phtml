@@ -1,0 +1,86 @@
+<?php $this->renderView('alerts/_success'); ?>
+<?php $this->renderView('alerts/_errors'); ?>
+<?php
+$file = __DIR__ . '/../../../storage/' . $this->view->user->name . '-log.txt';
+$myfile = fopen($file, "a+") or die("Unable to open file!");
+?>
+<header class="major">
+    <h2><?php echo $this->getPageTitle(); ?></h2>
+    <p>Aqui voce pode editar e aplicar configurações ou visualizar logs.</p>
+</header>
+<section>
+    <div><?php $this->renderView('alerts/_errors') ?><?php $this->renderView('alerts/_success'); ?></div>
+    <form action="/credential/<?php echo $this->view->user->id; ?>/update" method="post">
+        <div class="form-group">
+            <h3>Credenciais do Mercado pago</h3>
+            <div class="form-group">
+                <label for="test_access_token" class="control-label">Credenciais do modo produção</label>
+                <input type="password" name="access_token" class="form-control" value="<?php echo isset($this->view->credential) ? $this->view->credential->access_token : ""; ?>"/>
+            </div>
+            <div class="form-group">
+                <label for="access_token" class="control-label">Credenciais do modo teste</label>
+                <input type="password" name="test_access_token" class="form-control"  value="<?php echo isset($this->view->credential) ? $this->view->credential->test_access_token : ""; ?>"/>
+            </div>
+            <div class="form-group">
+                <label for="install_password" class="control-label">Senha de instalação</label>
+                <input type="password" name="install_password" class="form-control"  value="<?php echo isset($this->view->credential) ? $this->view->credential->install_password : ""; ?>"/>
+            </div>
+            <div class="row gtr-uniform gtr-50">
+                <div class="col-6 col-12-medium">
+                    <input type="radio" id="test" name="mode" value="test" <?php echo (isset($this->view->credential) && ($this->view->credential->mode == "test")) ? "checked" : ""; ?>>
+                    <label for="test">Usar credenciais de teste</label>
+                    <p>Usar as credenciais de teste fornecidas pelo API do Mercado Pago.</p>
+                </div>
+                <div class="col-6 col-12-medium">
+                    <input type="radio" id="prod" name="mode" value="prod" <?php echo (isset($this->view->credential) && ($this->view->credential->mode == "prod")) ? "checked" : ""; ?>>
+                    <label for="prod">Usar credenciais de produção</label>
+                    <p>Usar as credenciais para o modo de produção fornecidas pelo API do Mercado Pago</p>
+                </div>
+            </div>
+        </div>
+        <ul class="actions">
+            <li><button type="submit" class="button special">
+                    <i class="glyphicon glyphicon-save" aria-hidden="true"></i> Salvar
+                </button></li>
+        </ul>
+    </form>
+
+    Logs do Mercado Pago: <br />
+    <pre style="overflow-x: hidden; height: 100px;"><code><?php
+                                                            while (!feof($myfile)) {
+                                                                echo fgets($myfile);
+                                                            }
+                                                            fclose($myfile);
+                                                            ?>
+    </code></pre>
+
+    <form action="/user/service" method="post" target="_new">
+        <div class="form-group">
+            <h3>Teste de serviço cUrl:</h3>
+            <div class="row gtr-uniform gtr-50">
+                <div class="col-6 col-12-medium">
+                    <input type="radio" id="true" name="mikrotik" checked>
+                    <label for="true">Mikrotik fetch script</label>
+                    <p>Com auxilio de um <a target="_new" href="https://github.com/Unix-User/MikrotikFetchSync">script</a> e uma shedule em seu
+                        dispositivo, o mikrotik recupera as informações do site, e mantem atualizado os cadastros de usuário automaticamente. <b> Essa solução é mais simples, podendo ser implementada por qualquer usuário com pouco conhecimento, mas usa recursos na routerboard.</b></p>
+                </div>
+                <div class="col-6 col-12-medium">
+                    <input type="radio" id="false" name="mikrotik">
+                    <label for="false">PHP cUrl script</label>
+                    <p>Um <a target="_new" href="https://github.com/Unix-User/CurlSyncMP">script php </a>agendado no cron recupera as informações no banco de dados do site e sincroniza com o servidor MySql do freeradius
+                        que faz a autenticaçãos dos usuarios no mikrotik.<b> Essa opção é uma solução mais avançada que será implantada em servidor externo nescessitando conhecimentos adicionais</b></p>
+                </div>
+            </div>
+            <input type="hidden" name="email" class="form-control" value="<?php echo $this->view->user->email; ?>" />
+            <div class="form-group">
+                <label for="password" class="control-label">Selecione o teste que deseja e digite sua senha abaixo para verificar o retorno da url a ser enviada pelo cUrl</label>
+                <input type="text" name="password" class="form-control" />
+            </div>
+            <input type="hidden" name="mikrotik" value="true">
+            <ul class="actions">
+                <li><button type="submit" class="button special">
+                        <i class="glyphicon glyphicon-log-in" aria-hidden="true"></i> Verificar
+                    </button></li>
+            </ul>
+    </form>
+</section>
