@@ -1,0 +1,91 @@
+<header class="major">
+    <h2><?php echo $this->getPageTitle(); ?></h2>
+    <?php if (isset($this->view->ticket->id)) : ?>
+        <p>Abaixo a descrição completa do ticket
+            <br />Ticket nº: <?php echo $this->view->ticket->id; ?>
+        </p>
+    <?php else : ?>
+        <p>Informe o problema e a descrição para que possamos soluciona-lo.</p>
+    <?php endif; ?>
+</header>
+<div>
+    <?php if (isset($this->view->ticket->id)) : ?>
+        <div class="card bg-custom">
+            <div class="card-header">
+                <?php echo $this->view->ticket->title; ?>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title"><?php echo  " <span class='text-capitalize'>" . $this->view->user->find($this->view->ticket->owner_id)->name . "</span> enviou:"; ?></h5>
+                <p class="card-text"><?php echo $this->view->ticket->description; ?></p>
+            </div>
+        </div>
+        <hr>
+    <?php endif; ?>
+    <?php foreach ($this->view->tickets as $ticket) : ?>
+        <?php if ((($ticket->relative_to) == $this->view->ticket->id) && !is_null($ticket->relative_to)) : ?>
+            <div class="card bg-custom">
+                <div class="card-header">
+                    <?php echo $ticket->title; ?>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title"><?php echo  " <span class='text-capitalize'>" . $this->view->user->find($ticket->owner_id)->name . "</span> enviou:"; ?></h5>
+                    <p class="card-text"><?php echo $ticket->description; ?></p>
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    <form action="/ticket/register" method="post" accept-charset="utf-8">
+        <div class="row">
+            <div class="form-group <?php echo ($this->errors['titulo']) ? 'has-error ' : ' '; ?>12u 12u(medium) 12u$(xsmall)">
+                <?php if (!isset($this->view->ticket->id)) : ?>
+                    <label for="titulo" class="control-label">Problema</label>
+                    <input type="text" name="titulo" class="form-control" value="<?php echo (isset($this->inputs['titulo'])) ? $this->inputs['titulo'] : ""; ?>" <?php echo (isset($this->view->ticket)) ? 'readonly' : ''; ?>>
+                    <?php if ($this->errors['titulo']) : ?>
+                        <span class="help-block"><?php echo $this->errors['titulo'] ?></span>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <input type="hidden" name="titulo" class="form-control" value="<?php echo $this->view->ticket->date . " em resposta ao ticket: " . $this->view->ticket->id; ?>">
+                    <input type="hidden" name="relative_to" class="form-control" value="<?php echo $this->view->ticket->id; ?>">
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php if (!isset($this->view->ticket->status) || ($this->view->ticket->status == '0')) : ?>
+            <div class="row">
+                <div class="form-group <?php echo ($this->errors['description']) ? 'has-error ' : ' '; ?>10u 6u(medium) 12u$(xsmall)">
+
+                    <label for="description" class="control-label"><?php echo (isset($this->view->ticket)) ? "Resposta" : "Descrição"; ?></label>
+                    <textarea type="text" name="description" <?php echo (($this->view->ticket->status) == "1") ? 'readonly' : ''; ?>><?php echo (isset($this->inputs['description'])) ? $this->inputs['description'] : ""; ?></textarea>
+                    <?php if ($this->errors['description']) : ?><span class="help-block"><?php echo $this->errors['description'] ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="form-group pull-right <?php echo ($this->errors['image']) ? 'has-error ' : ' ' ?>2u 6u(medium) 12u$(xsmall)">
+                    <label for="fileInput">Enviar imagem</label>
+                    <a href="#" class="btn clean" onclick="document.getElementById('fileInput').click();"><span class="icon alt major fa-upload"></span></a>
+                    <input id="fileInput" type="file" name="image" style="display: none;" />
+                    <?php if ($this->errors['image']) : ?>
+                        <span class="help-block"><?php echo $this->errors['image'] ?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        <ul class="actions">
+            <?php if ($this->view->ticket->status == '0' | $this->view->ticket->status == null) : ?>
+                <li><a href="/support" class="button special small">voltar</a></li>
+                <li><button type="submit" class="button small">salvar</button></li>
+                <li>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="1" id="status" name="status" onchange="alert('o ticket sera encerrado')">
+                        <label class="form-check-label" for="status">
+                            Encerrado
+                        </label>
+                    </div>
+                </li>
+            <?php elseif ($this->view->ticket->status == '1') : ?>
+                <li><a href="/support" class="button special small">voltar</a></li>
+            <?php else : ?>
+                <li><a href="/support" class="button special small">voltar</a></li>
+                <li><button type="submit" class="button small">Salvar</button></li>
+            <?php endif; ?>
+        </ul>
+    </form>
+</div>

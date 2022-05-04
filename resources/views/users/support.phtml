@@ -1,0 +1,46 @@
+<?php $this->renderView('alerts/_success'); ?>
+<?php $this->renderView('alerts/_errors'); ?>
+<header class="major">
+    <h2><?php echo $this->getPageTitle(); ?></h2>
+    <p>Nessa página voce solicita e gerencia os tickets de suporte tecnico.</p>
+</header>
+<section>
+    <div class="table-wrapper">Tickets: <br />
+        <table class="alt">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>titulo</th>
+                    <th class="hidden-xs">cliente</th>
+                    <th class="hidden-xs">data</th>
+                    <th class="hidden-xs">status</th>
+                    <th class="text-right"><a href="/support/ticket" class="icon fa-plus special"></a></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->view->tickets as $ticket): ?>
+                    <?php if ($ticket->owner_id == $this->auth->id() | $this->auth->admin() && $ticket->relative_to == null): ?>
+                    <tr>
+                        <th><a class="clean" href="/ticket/<?php echo $ticket->id; ?>/show" ><?php echo $ticket->id; ?></a></th>
+                        <th><a class="clean" href="/ticket/<?php echo $ticket->id; ?>/show" ><?php echo $ticket->title; ?></a></th>
+                        <th class="hidden-xs"><?php echo $this->view->users->find($ticket->owner_id)->name; ?></th>
+                        <th class="hidden-xs"><?php echo $ticket->date; ?></th>
+                        <th class="hidden-xs"><?php echo (($ticket->status) == '1') ? 'encerrado' :'aberto' ; ?></th>
+                        <th class="text-right">
+                            <?php if ($this->auth->check() | $this->auth->admin()) : ?>
+                                <?php if(($ticket->status) == '0' | ($ticket->status) == null) : ?>
+                                <a href="/ticket/<?php echo $ticket->id ?>/close" class="icon fa-square " onclick="return confirm('Deseja encerrar o ticket de suporte? O atendimento sera marcado como concluido e não estará mais acessivel.')"></a>
+                                <?php else: ?>
+                                <a href="#" class="icon fa-check-square " onclick="return alert('Esse ticket de suporte já foi encerrado, voce deve abrir um novo.')"></a>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="icon fa-square "></span>
+                            <?php endif; ?>
+                        </th>
+                        <?php endif; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</section>
