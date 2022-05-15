@@ -1,3 +1,13 @@
+@extends('layouts.default')
+
+@section('title' , 'ISP')
+
+@push('styles')
+<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+@endpush
+
+
+@section('content')
 <header class="major">
     <h2>Gerenciamento efetivo e disponibilidade</h2>
     <p>Confira algumas informações sobre a aplicação dos processo de gestão e disponibilidade de rede</p>
@@ -51,3 +61,4 @@
 
     </div>
 </div>
+@endsection

@@ -16,10 +16,26 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description');
-            $table->string('image');
-            $table->string('price');
-            $table->string('category');
+            $table->string('description')->nullable();
+            $table->string('image')->nullable();
+            $table->string('price')->nullable();
+            $table->foreignId('user_id')
+                ->constrained()
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->string('tags')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('product_user', function (Blueprint $table) {
+            $table->string('product_id')
+                ->constrained()
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->string('user_id')
+                ->constrained()
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -32,5 +48,6 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('products');
+        Schema::dropIfExists('product_user');
     }
 };

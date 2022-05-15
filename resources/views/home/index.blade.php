@@ -1,4 +1,14 @@
-<header class="major">  
+@extends('layouts.default')
+
+@section('title' , 'Inicio')
+
+@push('styles')
+<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+@endpush
+
+
+@section('content')
+<header class="major">
     <?php if ($this->auth->check() && $this->auth->admin()): ?>
         <h2>Bem vindo <span class="text-capitalize"><?php echo $this->auth->name() ?></span></h2>
         <p>Voce tem privilégios administrativos para gerenciar o sistema</p>
@@ -63,3 +73,4 @@
         </div>
     </div>
 </section>
+@endsection

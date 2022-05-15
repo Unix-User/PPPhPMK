@@ -1,3 +1,13 @@
+@extends('layouts.default')
+
+@section('title' , 'Inicio')
+
+@push('styles')
+<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+@endpush
+
+
+@section('content')
 <header class="major">
     <h2>Bem vindo <span class="text-capitalize"><?php echo $this->auth->name() ?></span></h2>
     <p>Informações administrativas</p>
@@ -55,3 +65,4 @@
         $('#myTab li:last-child a').tab('show')
     })
 </script>
+@endsection
