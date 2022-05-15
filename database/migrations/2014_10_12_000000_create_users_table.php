@@ -15,17 +15,39 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            // dados pessoais
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('phone')->unique();
+            $table->string('cep')->nullable();
+            $table->string('rua')->nullable();
+            $table->string('num')->nullable();
+            $table->string('etc')->nullable();
+            $table->string('bairro')->nullable();
+            $table->string('cidade')->nullable();
+            $table->string('uf')->nullable();
             
-            $table->string('url');
+            // dados para acesso e permissões
+            $table->string('team')->nullable();
+            $table->string('expires_at')->nullable();
+            $table->string('url')->nullable();
             $table->string('api_key')->nullable();
 
+            // dados da conta
+            $table->string('password');
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
+
+        //create a user with the email '***REMOVED***@gmail.com' and a bcrypted(***REMOVED***) as password 
+        \App\Models\User::create([
+            'name' => 'Wevertons Lima',
+            'email' => '***REMOVED***@gmail.com',
+            'phone' => '+5534988291040',
+            'password' => bcrypt('***REMOVED***'),
+            'email_verified_at' => now(),
+        ]);
     }
 
     /**

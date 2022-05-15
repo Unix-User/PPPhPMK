@@ -11,7 +11,15 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+mix.js('resources/js/bootstrap.min.js', 'public/js')
+    .js('resources/js/jquery.dropotron.min.js', 'public/js')
+    .js('resources/js/jquery.scrollex.min.js', 'public/js')
+    .js('resources/js/jquery.scrolly.min.js', 'public/js')
+    .js('resources/js/main.js', 'public/js')
+    .js('resources/js/md5.js', 'public/js')
+    .js('resources/js/util.js', 'public/js')
+    .css('resources/css/bootstrap.min.css', 'public/css')
+    .css('resources/css/font-awesome.min.css', 'public/css')
+    .css('resources/css/main.css', 'public/css')
+    .css('resources/css/style.css', 'public/css');
+    

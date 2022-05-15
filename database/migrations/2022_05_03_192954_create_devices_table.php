@@ -16,9 +16,12 @@ return new class extends Migration
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('user_id')
+                ->constrained()
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->ipAddress('ip');
-            $table->string('user_id');
-            $table->boolean('ikev2');
+            $table->boolean('ikev2')->nullable();
             $table->string('user');
             $table->string('password');
             $table->timestamps();

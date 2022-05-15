@@ -1,3 +1,13 @@
+@extends('layouts.default')
+
+@section('title' , 'Dispositivos')
+
+@push('styles')
+<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+@endpush
+
+
+@section('content')
 <?php $this->renderView('alerts/_success'); ?>
 <?php $this->renderView('alerts/_errors'); ?>
 <header class="major">
@@ -44,3 +54,4 @@
         </table>
     </div>
 </section>
+@endsection
