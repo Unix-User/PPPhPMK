@@ -25,7 +25,7 @@
                     <th class="hidden-xs">team</th>
                     <th class="hidden-xs">expires_at</th>
                     <th class="text-right">
-                        <a href="/user/create" class="icon fa-plus special"></a>
+                        <a href="/user/create" class="icon solid fa-plus special"></a>
                     </th>
                 </tr>
             </thead>
@@ -51,8 +51,8 @@
                         {{ ($user->expires_at == null || $user->expires_at == '0000-00-00') ? 'N/A' : date('d-m-Y', strtotime($user->expires_at)); }}
                     </th>
                     <th class="text-right">
-                        <a href="/user/{{ $user->id; }}/edit" class="icon fa-edit"></a>
-                        <a href="/user/{{ $user->id; }}/delete" class="icon fa-trash"></a>
+                        <a href="/user/{{ $user->id; }}/edit" class="icon solid fa-edit"></a>
+                        <a href="/user/{{ $user->id; }}/delete" class="icon solid fa-trash"></a>
                     </th>
                 </tr>
                 @endforeach

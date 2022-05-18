@@ -33,7 +33,7 @@
     </div>
     @endif
     <div class="panel-body row 50% uniform">
-        <a href="/product/create" class="clean icon fa-plus special pull-right"></a>
+        <a href="/product/create" class="clean icon solid fa-plus special pull-right"></a>
     </div>&nbsp
     <div class="card-columns">
         @foreach($products as $product)
@@ -50,8 +50,8 @@
                     </div>
                     <div class="card-footer">
                         <small class="text-muted float-end">
-                            <a class="clean icon fa-edit" href="/product/{{ $product->id }}/edit"></a>
-                            <a class="clean icon fa-trash" href="/product/{{ $product->id }}/delete" onclick="return confirm('Deletar esse intem?')"></a>
+                            <a class="clean icon solid fa-edit" href="/product/{{ $product->id }}/edit"></a>
+                            <a class="clean icon solid fa-trash" href="/product/{{ $product->id }}/delete" onclick="return confirm('Deletar esse intem?')"></a>
                         </small>
                     </div>
                 </a>
@@ -62,8 +62,9 @@
     <div class="d-flex justify-content-center">
         {{ $products->links() }}
     </div>
-    @endsection
+</div>
+@endsection
 
-    @push('scripts')
+@push('scripts')
 
-    @endpush
+@endpush

@@ -1,13 +1,14 @@
 {
-    "/js/bootstrap.min.js": "/js/bootstrap.min.js",
+    "/js/jquery.min.js": "/js/jquery.min.js",
+    "/js/breakpoints.min.js": "/js/breakpoints.min.js",
+    "/js/jquery.scrolly.min.js": "/js/jquery.scrolly.min.js",
     "/js/jquery.dropotron.min.js": "/js/jquery.dropotron.min.js",
     "/js/jquery.scrollex.min.js": "/js/jquery.scrollex.min.js",
-    "/js/jquery.scrolly.min.js": "/js/jquery.scrolly.min.js",
-    "/js/main.js": "/js/main.js",
-    "/js/md5.js": "/js/md5.js",
+    "/js/browser.min.js": "/js/browser.min.js",
     "/js/util.js": "/js/util.js",
+    "/js/main.js": "/js/main.js",
+    "/css/main.css": "/css/main.css",
     "/css/style.css": "/css/style.css",
-    "/css/bootstrap.min.css": "/css/bootstrap.min.css",
-    "/css/font-awesome.min.css": "/css/font-awesome.min.css",
-    "/css/main.css": "/css/main.css"
+    "/css/noscript.css": "/css/noscript.css",
+    "/css/fontawesome-all.min.css": "/css/fontawesome-all.min.css"
 }

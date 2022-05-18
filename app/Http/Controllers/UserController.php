@@ -14,6 +14,9 @@ use App\Models\Contract;
 use App\Mail\PasswordReset;
 use MercadoPago\SDK;
 use MercadoPago\Payment;
+use MercadoPago\Preference;
+use MercadoPago\Item;
+
 
 
 
@@ -92,34 +95,7 @@ class UserController extends Controller
     {
         // find user with id
         $user = User::find($id);
-        // load SDK Mercado Pago and set access token
-        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
-
-        $payment = new Payment();
-        $payment->transaction_amount = 1;
-        $payment->description = $user->contracts->first()->product->name;
-        $payment->payment_method_id = "pix";
-        $payment->payer = array(
-            "email" => $user->email,
-            "first_name" => $user->name,
-            "last_name" => $user->name,
-            "identification" => array(
-                "type" => "CPF",
-                "number" => "19119119100"
-            ),
-            "address" =>  array(
-                "zip_code" => $user->cep,
-                "street_name" => $user->rua,
-                "street_number" => $user->num,
-                "street_complement" => $user->etc,
-                "city" => $user->cidade,
-                "state" => $user->uf,
-                "country" => "BRA"
-            )
-        );
-        $payment->save();
-
-        return view('users.show', compact('user', 'preference'));
+        return view('users.show', compact('user'));
     }
 
     public function edit($id)
@@ -175,7 +151,6 @@ class UserController extends Controller
         $user->password = bcrypt($request->password);
 
         $user->save();
-        //save new user->contract with product_id
         $user->contracts()->sync($request->product_id);
 
         return redirect('/users');
@@ -227,7 +202,7 @@ class UserController extends Controller
             Mail::to($user)->send(new PasswordReset($user, $token));
             return redirect('/login')->with('success', 'Password reset link sent to your email');
         } else {
-            return redirect('/recovery')->with('error', 'Email not found');
+            return redirect('/login')->with('error', 'Email not found');
         }
     }
 
@@ -255,6 +230,49 @@ class UserController extends Controller
         } else {
             return redirect('/login')->with('error', 'Invalid token');
         }
+    }
+
+    public function payment($id)
+    {
+        $user = User::find($id);
+        // load SDK Mercado Pago and set access token
+        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
+
+        // Cria um objeto de preferência
+        $preference = new Preference();
+
+        // Cria um item na preferência
+        $item = new Item();
+        $item->title = $user->contracts->first()->name;
+        $item->quantity = 1;
+        $item->unit_price = $user->contracts->first()->price;
+        $preference->items = array($item);
+        $preference->save();
+
+        $payment = new Payment();
+        $payment->transaction_amount = $user->contracts->first()->price;
+        $payment->description = $user->contracts->first()->name;
+        $payment->payment_method_id = "pix";
+        $payment->payer = array(
+            "email" => "wevertonsilveiralima@hotmail.com",
+            "first_name" => $user->name,
+            "last_name" => $user->name,
+            "identification" => array(
+                "type" => "CPF",
+                "number" => "19119119100"
+            ),
+            "address" =>  array(
+                "zip_code" => $user->cep,
+                "street_name" => $user->rua,
+                "street_number" => $user->num,
+                "neighborhood" => $user->bairro,
+                "city" => $user->cidade,
+                "federal_unit" => $user->uf
+            )
+        );
+        $payment->save();
+
+        return view('users.checkout', compact('user', 'payment', 'preference'));
     }
 
     public function logout()
