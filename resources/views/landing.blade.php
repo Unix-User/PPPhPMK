@@ -4,12 +4,14 @@
 <head>
     <title>{{ config('app.name', 'UnixLocal') }}</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href=" {{ mix('css/main.css')}} " />
     <link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
-    <script src="https://kit.fontawesome.com/a668bbe4fe.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href=" {{ mix('css/fontawesome-all.min.css')}} " />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <noscript>
+        <link rel="stylesheet" href="{{mix('/css/noscript.css')}}" />
+    </noscript>
 </head>
 
 <body class="landing">
@@ -21,7 +23,7 @@
                 <!-- Menu do topo -->
                 <ul>
                     <li><a href="/contact">Contato</a></li>
-                    <li><a href="/products" class="button special">Clientes</a></li>
+                    <li><a href="/products" class="button primary">Clientes</a></li>
                 </ul>
                 <!-- Fim menu do topo -->
             </nav>
@@ -35,14 +37,14 @@
                     <p>E não existem pranchas ou carros voadores.<br />
                         Somente Aplicativos, e várias outras páginas e coisas na internet.</p>
                 </header>
-                <span class="image"><img src="images/20220511225443.jpg" alt="" /></span>
+                <span class="image"><img src="images/pic01.jpg" alt="" /></span>
             </div>
             <a href="#one" class="goto-next scrolly">Next</a>
         </section>
 
         <!-- One - Apresentação -->
         <section id="one" class="spotlight style1 bottom">
-            <span class="image fit main"><img src="images/20220511225443.jpg" alt="" /></span>
+            <span class="image fit main"><img src="images/pic02.jpg" alt="" /></span>
             <div class="content">
                 <div class="container">
                     <div class="row">
@@ -70,7 +72,7 @@
 
         <!-- Two - Desenvolvimento -->
         <section id="two" class="spotlight style2 right">
-            <span class="image fit main"><img src="images/20220511225443.jpg" alt="" /></span>
+            <span class="image fit main"><img src="images/pic03.jpg" alt="" /></span>
             <div class="content">
                 <header>
                     <h2>Desenvolvimento Web e aplicações mobile</h2>
@@ -88,7 +90,7 @@
 
         <!-- Three - Redes, ISP, Suporte e consultoria -->
         <section id="three" class="spotlight style3 left">
-            <span class="image fit main bottom"><img src="images/20220511225443.jpg" alt="" /></span>
+            <span class="image fit main bottom"><img src="images/pic04.jpg" alt="" /></span>
             <div class="content">
                 <header>
                     <h2>Integração hotspot/pppoe + Mercado Pago</h2>
@@ -111,49 +113,61 @@
                 </header>
                 <div class="box alt">
                     <div class="row uniform">
-                        <section class="4u 6u(medium) 12u$(xsmall)">
-                            <span class="icon alt major fa-chart-area"></span>
+                        <section class="col-4 col-6-medium col-12-xsmall">
+                            <span class="icon solid alt major fa-chart-area"></span>
                             <h3>Aumente a efiácia</h3>
                             <p>Em uma ferramenta informatizada vc tem um ágil controle sobre sua podrução e gestão do négócio, poupa tempo e maximiza lucros</p>
                         </section>
-                        <section class="4u 6u$(medium) 12u$(xsmall)">
-                            <span class="icon alt major fa-comment"></span>
+                        <section class="col-4 col-6-medium col-12-xsmall">
+                            <span class="icon solid alt major fa-comment"></span>
                             <h3>Mantenha contato</h3>
                             <p>Centralize informações da empresa para contato e/ou mantenha um canal direto com o cliente sem inteferencias.</p>
                         </section>
-                        <section class="4u$ 6u(medium) 12u$(xsmall)">
-                            <span class="icon alt major fa-search"></span>
+                        <section class="col-4 col-6-medium col-12-xsmall">
+                            <span class="icon solid alt major fa-search"></span>
                             <h3>Visibilidade e marketing</h3>
                             <p>Sua empresa, produto ou serviço fica visivel no mundo pela internet, informa sobre campanhas publicitárias e promoções.</p>
                         </section>
-                        <section class="6u 6u(medium) 12u$(xsmall)">
-                            <span class="icon alt major fa-money-bill-alt"></span>
+                        <section class="col-6 col-6-medium col-12-xsmall">
+                            <span class="icon solid alt major fa-money-bill-alt"></span>
                             <h3>Meios de pagamento facilitados</h3>
                             <p>Receba por meios de pagamento informatizados como cartões, transferencias, boletos, aplicativos de pagamento e etc.</p>
                         </section>
-                        <section class="6u 6u$(medium) 12u$(xsmall)">
-                            <span class="icon alt major fa-lock"></span>
+                        <section class="col-6 col-6-medium col-12-xsmall">
+                            <span class="icon solid alt major fa-lock"></span>
                             <h3>Segurança em foco</h3>
                             <p>Utilize a nuvem para proteger e armazenar seus dados, integre sistemas de segurança para monitoramento on-line como alarmes e cameras.</p>
                         </section>
                     </div>
                 </div>
-                <footer class="major">
-                    <ul class="actions">
-                        <li><a href="/client" class="button">Área do cliente</a></li>
-                    </ul>
-                </footer>
             </div>
         </section>
     </div>
+    <!-- Five -->
+    <section id="five" class="wrapper style2 special fade">
+        <div class="container">
+            <header>
+                <h2>Cadastre-se para receber nossas ofertas</h2>
+                <p>Entraremos em contato sempre que tivermos uma promoção ou oferta especial</p>
+            </header>
+            <form method="post" action="#" class="cta">
+                <div class="row gtr-uniform gtr-50">
+                    <div class="col-8 col-12-xsmall"><input type="email" name="email" id="email" placeholder="Seu melhor endereço de e-mail" /></div>
+                    <div class="col-4 col-12-xsmall"><input type="submit" value="Cadastrar-se" class="fit primary" /></div>
+                </div>
+            </form>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer id="footer">
         <ul class="icons">
-            <li><a href="https://twitter.com/wevertonslima" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
-            <li><a href="https://wa.me/5534988291040" class="icon alt fa-whatsapp"><span class="label">Whatsapp</span></a></li>
-            <li><a href="https://t.me/wevertonslima" class="icon alt fa-telegram"><span class="label">Telegram</span></a></li>
-            <li><a href="https://github.com/Unix-User" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
-            <li><a href="mailto:wevertonslima@gmail.com" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
+            <li><a href="https://twitter.com/wevertonslima" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+            <li><a href="https://wa.me/5534988291040" class="icon brands alt fa-whatsapp"><span class="label">Whatsapp</span></a></li>
+            <li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+            <li><a href="https://t.me/wevertonslima" class="icon brands alt fa-telegram"><span class="label">Telegram</span></a></li>
+            <li><a href="https://github.com/Unix-User" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+            <li><a href="mailto:wevertonslima@gmail.com" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
         </ul>
         <ul class="copyright">
             <li>&copy; MPRadFramework. All rights reserved.</li>
@@ -177,16 +191,15 @@
     </script>
     <script id="intergram" type="text/javascript" src="https://unixat.herokuapp.com/js/widget.js"></script>
     <!-- <script id="intergram" type="text/javascript" src="https://www.intergram.xyz/js/widget.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="{{mix('/js/jquery.scrolly.min.js')}}"></script>
-    <script src="{{mix('/js/jquery.dropotron.min.js')}}"></script>
-    <script src="{{mix('/js/jquery.scrollex.min.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"></script>
-    <script src="{{mix('/js/util.js')}}"></script>
-    <!--[if lte IE 8]>
-        <script src="assets/js/ie/respond.min.js"></script>
-        <![endif]-->
-    <script src="{{mix('/js/main.js')}}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{mix('/js/bootstrap.min.js')}}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{{mix('js/jquery.min.js')}}"></script>
+    <script src="{{mix('js/breakpoints.min.js')}}"></script>
+    <script src="{{mix('js/jquery.scrolly.min.js')}}"></script>
+    <script src="{{mix('js/jquery.dropotron.min.js')}}"></script>
+    <script src="{{mix('js/jquery.scrollex.min.js')}}"></script>
+    <script src="{{mix('js/browser.min.js')}}"></script>
+    <script src="{{mix('js/util.js')}}"></script>
+    <script src="{{mix('js/main.js')}}"></script>
 </body>
+
+</html>

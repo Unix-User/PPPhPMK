@@ -27,6 +27,8 @@ Route::controller(UserController::class)->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('users', 'index');
         Route::get('user/{id}/show', 'show');
+        // route for payment
+        Route::get('user/{id}/payment', 'payment');
         Route::get('user/{id}/edit', 'edit');
         Route::post('user/{id}/update', 'update');
         Route::get('user/{id}/delete', 'delete');
