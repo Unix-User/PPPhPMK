@@ -3,7 +3,6 @@
 @section('title' , 'Recuperação de senha')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
 @endpush
 
 

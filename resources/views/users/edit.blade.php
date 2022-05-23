@@ -3,17 +3,16 @@
 @section('title' , 'Editar usuário')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
 <!-- Adicionando JQuery    -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 @endpush
-
 
 @section('content')
 <header class="major">
     <h2>Editar usuário</h2>
     <p>Aqui você pode editar os dados do usuário</p>
 </header>
+
 @if ($errors->any())
 <div style="width: 100%; position: relative; background-color: #272833; border-color: #843534" class="alert alert-danger alert-dismissable" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -40,7 +39,7 @@
                 </div>
                 <div class="@if($errors->has('password')) has-error @endif col-md-3 col-md-offset-0">
                     <label for="password">Senha</label>
-                    <input type="password" name="password" id="password" class="form-control" value="{{ $user->password }}" />
+                    <input type="password" name="password" id="password" class="form-control" value="" placeholder="Digite para alterar" />
                     @if($errors->has('password'))
                     <span class="help-block">{{ $errors->first('password') }}</span>
                     @endif
@@ -52,11 +51,15 @@
                     <span class="help-block">{{ $errors->first('phone') }}</span>
                     @endif
                 </div>
-                <div class="@if($errors->has('vencimento')) has-error @endif col-md-3 col-md-offset-0">
-                    <label for="vencimento">Vencimento</label>
-                    <input type="date" name="vencimento" id="vencimento" class="form-control" value="{{ $user->vencimento }}" />
-                    @if($errors->has('vencimento'))
-                    <span class="help-block">{{ $errors->first('vencimento') }}</span>
+                <div class="@if($errors->has('cep')) has-error @endif col-md-3 col-md-offset-0">
+                    <label for="product_id">Produto</label>
+                    <select name="product_id" id="product_id" class="form-control">
+                        @foreach($products as $product)
+                        <option value="{{ $product->id }}" @if((isset($user->contracts->first()->id)) == $product->id) selected @endif>{{ $product->name }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('product_id'))
+                    <span class="help-block">{{ $errors->first('product_id') }}</span>
                     @endif
                 </div>
                 <div class="@if($errors->has('email')) has-error @endif col-md-12 col-md-offset-0">
@@ -64,17 +67,6 @@
                     <input type="email" name="email" id="email" class="form-control" value="{{ $user->email }}" />
                     @if($errors->has('email'))
                     <span class="help-block">{{ $errors->first('email') }}</span>
-                    @endif
-                </div>
-                <div class="@if($errors->has('cep')) has-error @endif col-md-3 col-md-offset-0">
-                    <label for="product_id">Produto</label>
-                    <select name="product_id" id="product_id" class="form-control">
-                        @foreach($products as $product)
-                        <option value="{{ $product->id }}" @if($user->product_id == $product->id) selected @endif>{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('product_id'))
-                    <span class="help-block">{{ $errors->first('product_id') }}</span>
                     @endif
                 </div>
                 <div class="@if($errors->has('cep')) has-error @endif col-md-3 col-md-offset-0">

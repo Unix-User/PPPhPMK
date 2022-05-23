@@ -3,7 +3,6 @@
 @section('title' , 'Usuários')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
 @endpush
 
 
@@ -19,11 +18,11 @@
                 <tr>
                     <th>id</th>
                     <th>usuário</th>
-                    <th>telefone</th>
-                    <th class="hidden-xs">email</th>
-                    <th class="hidden-xs">product</th>
-                    <th class="hidden-xs">team</th>
-                    <th class="hidden-xs">expires_at</th>
+                    <th class="d-none d-lg-table-cell ">telefone</th>
+                    <th class="d-none d-lg-table-cell ">email</th>
+                    <th class="d-none d-lg-table-cell ">product</th>
+                    <th class="d-none d-lg-table-cell ">team</th>
+                    <th class="d-none d-lg-table-cell ">expires_at</th>
                     <th class="text-right">
                         <a href="/user/create" class="icon solid fa-plus special"></a>
                     </th>
@@ -34,20 +33,20 @@
                 <tr>
                     <th><a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->id; }}</a></th>
                     <th><a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->name; }}</a></th>
-                    <th class="clean"><a target="_new" href="https://wa.me/55{{ $user->phone; }}" class="icon alt fa-whatsapp"><span class="label">Whatsapp</span></a> {{ $user->phone; }}</th>
-                    <th class="hidden-xs"><a href="mailto:{{ $user->email; }}" class="icon alt fa-envelope"><span class="label">Email</span></a> {{ $user->email; }}</th>
-                    <th class="hidden-xs">
+                    <th class="d-none d-lg-table-cell"><a target="_new" href="https://wa.me/55{{ $user->phone; }}" class="icon clean alt fa-whatsapp"><span class="label">Whatsapp</span></a> {{ $user->phone; }}</th>
+                    <th class="d-none d-lg-table-cell"><a href="mailto:{{ $user->email; }}" class="icon alt fa-envelope"><span class="label">Email</span></a> {{ $user->email; }}</th>
+                    <th class="d-none d-lg-table-cell">
                         @foreach($user->contracts as $contract)
                         {{ $contract->name }}<br />
                         @endforeach
                     </th>
                     <!-- display all teams this user belongs to -->
-                    <th class="hidden-xs">
+                    <th class="d-none d-lg-table-cell">
                         @foreach($user->teams as $team)
                         {{ $team->name; }}
                         @endforeach
                     </th>
-                    <th class="hidden-xs">
+                    <th class="d-none d-lg-table-cell">
                         {{ ($user->expires_at == null || $user->expires_at == '0000-00-00') ? 'N/A' : date('d-m-Y', strtotime($user->expires_at)); }}
                     </th>
                     <th class="text-right">

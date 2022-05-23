@@ -3,7 +3,6 @@
 @section('title' , 'Usuários')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
 @endpush
 
 @section('content')

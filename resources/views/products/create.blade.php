@@ -48,18 +48,18 @@
                         </span>
                         @endif
                     </div>
-                    <div class="2u 6u(medium) 12u$(xsmall) @if ($errors->has('rate_limit')) has-error @endif">
-                        <label for="rate_limit">Rate limit</label>
-                        <input type="number" name="rate_limit" class="form-control" value="{{ old('rate_limit') }}" placeholder="Rate limit" required>
-                        @if ($errors->has('rate_limit'))
+                    <div class="2u 6u(medium) 12u$(xsmall) @if ($errors->has('tags')) has-error @endif">
+                        <label for="tags">Rate limit</label>
+                        <input type="text" name="tags" class="form-control" value="{{ old('tags') }}" placeholder="Rate limit" required>
+                        @if ($errors->has('tags'))
                         <span class="help-block">
-                            <strong>{{ $errors->first('rate_limit') }}</strong>
+                            <strong>{{ $errors->first('tags') }}</strong>
                         </span>
                         @endif
                     </div>
                     <div class="2u 6u(medium) 12u$(xsmall) @if ($errors->has('price')) has-error @endif">
                         <label for="price">Valor</label>
-                        <input type="number" name="price" class="form-control" value="{{ old('price') }}" placeholder="Valor" required>
+                        <input type="text" name="price" class="form-control" value="{{ old('price') }}" placeholder="Valor" required>
                         @if ($errors->has('price'))
                         <span class="help-block">
                             <strong>{{ $errors->first('price') }}</strong>
@@ -70,7 +70,7 @@
                 <div class="form-group row">
                     <div class="10u 6u(medium) 12u$(xsmall) @if ($errors->has('description')) has-error @endif">
                         <label for="description" class="control-label">Descrição</label>
-                        <textarea name="description" class="form-control" placeholder="Descrição" required>{{ old('description') }}</textarea>
+                        <textarea type="text" name="description" placeholder="Descrição" required>{{ old('description') }}</textarea>
                         @if ($errors->has('description'))
                         <span class="help-block">
                             <strong>{{ $errors->first('description') }}</strong>

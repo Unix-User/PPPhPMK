@@ -3,7 +3,6 @@
 @section('title' , '{{ $user->name }}')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
 @endpush
 
 @section('content')
@@ -30,6 +29,7 @@
 </header>
 <!-- Content -->
 <div class="card-deck">
+    @if($user->contracts->count() > 0)
     <div class="card col-sm-4 bg-custom">
         <a class="clean" href="/product/{{  $user->contracts->first()->id; }}/show">
             <div class="card-header">
@@ -38,7 +38,7 @@
             </div>
             <img class="card-img-top" src="/images/{{ $user->contracts->first()->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text">{{ $user->contracts->first()->description; }}
+                <p class="card-text text-truncate">{{ $user->contracts->first()->description; }}
                     <br />Técnico: <a href="/user/{{ $user->contracts->first()->user->id }}/show">{{ $user->contracts->first()->user->name }}</a>
                 </p>
                 <p class="card-text"><small class="text-muted"> R${{ $user->contracts->first()->price; }}</small></p>
@@ -50,6 +50,27 @@
             </div>
         </a>
     </div>
+    @else
+    <div class="card col-sm-4 bg-custom">
+        <a class="clean" href="/products">
+            <div class="card-header">
+                <span class="icon alt fa-wifi"></span>
+                <strong class="text-capitalize">Selecione um Plano</strong>
+            </div>
+            <img class="card-img-top" src="/images/pic01.jpg" alt="Card image cap">
+            <div class="card-body">
+                <p class="card-text text-truncate">Selecione um plano para continuar
+                </p>
+                <p class="card-text"><small class="text-muted"> R$ -- </small></p>
+            </div>
+            <div class="card-footer">
+                <ul class="actions">
+                    <li><a href="/products" class="button">Selecionar outro plano</a></li>
+                </ul>
+            </div>
+        </a>
+    </div>
+    @endif
     <div class="card col-sm-8 bg-custom">
         <div class="card-header">
             <span class="icon alt fa-user"></span>
@@ -75,7 +96,9 @@
         </div>
         <div class="card-footer">
             <ul class="actions">
+                @if($user->contracts->count() > 0)
                 <li><a href="/user/{{ $user->id }}/payment" class="button">Pagar</a></li>
+                @endif
                 <li><a href="/user/{{ $user->id }}/edit" class="button">Editar</a></li>
             </ul>
         </div>
@@ -106,27 +129,3 @@
     </div>
 </div>
 @endsection
-
-
-@push('scripts')
-<script>
-    $(function() {
-        $('#nav-profile-tab').tab('show')
-    })
-
-    function copyToClipboard(element) {
-        var $temp = $("<input>");
-        $("body").append($temp);
-        $temp.val($(element).val()).select();
-        document.execCommand("copy");
-        $temp.remove();
-    }
-</script>
-@endpush
-
-@prepend('scripts')
-<script src="https://sdk.mercadopago.com/js/v2"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-@endprepend
