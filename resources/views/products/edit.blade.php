@@ -47,18 +47,18 @@
                         </span>
                         @endif
                     </div>
-                    <div class=" 2u 6u(medium) 12u$(xsmall) @if ($errors->has('rate_limit')) has-error @endif">
-                        <label for="rate_limit">Rate limit</label>
-                        <input type="number" name="rate_limit" class="form-control" value="{{ $product->rate_limit }}" placeholder="Rate limit" required>
-                        @if ($errors->has('rate_limit'))
+                    <div class=" 2u 6u(medium) 12u$(xsmall) @if ($errors->has('tags')) has-error @endif">
+                        <label for="tags">Rate limit</label>
+                        <input type="text" name="tags" class="form-control" value="{{ $product->tags }}" placeholder="Rate limit" required>
+                        @if ($errors->has('tags'))
                         <span class="help-block 10u 6u(medium) 12u$(xsmall)">
-                            <strong>{{ $errors->first('rate_limit') }}</strong>
+                            <strong>{{ $errors->first('tags') }}</strong>
                         </span>
                         @endif
                     </div>
                     <div class=" 2u 6u(medium) 12u$(xsmall) @if ($errors->has('price')) has-error @endif">
                         <label for="price">Valor</label>
-                        <input type="number" name="price" class="form-control" value="{{ $product->price }}" placeholder="Valor" required>
+                        <input type="text" name="price" class="form-control" value="{{ $product->price }}" placeholder="Valor" required>
                         @if ($errors->has('price'))
                         <span class="help-block 10u 6u(medium) 12u$(xsmall)">
                             <strong>{{ $errors->first('price') }}</strong>
@@ -69,7 +69,7 @@
                 <div class="row form-group">
                     <div class="fit 10u 6u(medium) 12u$(xsmall) @if ($errors->has('category')) has-error @endif">
                         <label for="title" class="control-label">Descrição</label>
-                        <textarea type="text" name="description">{{ $product->description }}</textarea>
+                        <textarea type="text" name="description" placeholder="Descrição" required>{{ $product->description }}</textarea>
                         @if ($errors->has('description'))
                         <span class="help-block 10u 6u(medium) 12u$(xsmall)">
                             <strong>{{ $errors->first('description') }}</strong>
@@ -83,7 +83,7 @@
                             <i class="icon alt major fa-upload" aria-hidden="true"></i>
                         </button>
                         <!-- file input -->
-                        <input type="file" name="image" id="formImage" class="form-control" required>
+                        <input type="file" name="image" id="formImage" class="form-control">
                         @if ($errors->has('image'))
                         <span class="help-block">
                             <strong>{{ $errors->first('image') }}</strong>

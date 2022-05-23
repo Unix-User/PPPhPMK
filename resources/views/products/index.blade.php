@@ -32,24 +32,28 @@
         </button>
     </div>
     @endif
+    @if (Auth::check())
     <div class="panel-body row 50% uniform">
         <a href="/product/create" class="clean icon solid fa-plus special pull-right"></a>
     </div>&nbsp
+    @endif
     <div class="card-columns">
         @foreach($products as $product)
+        @if (Auth::check())
         <div class="col">
             <div class="card bg-custom h-100">
                 <a class="clean" href="/product/{{  $product->id; }}/show">
                     <img class="card-img-top" src="/images/{{ $product->image }}" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->name; }}</h5>
-                        <p class="card-text">{{ $product->description; }}
-                            <br />Técnico: <a href="/user/{{ $product->user->id }}/show">{{ $product->user->name }}</a>
-                        </p>
-                        <p class="card-text"><small class="text-muted"> R${{ $product->price; }}</small></p>
+                        <p class="card-text text-truncate">{{ $product->description; }}</p>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <small class="text-muted">saiba mais</small>
                     </div>
                     <div class="card-footer">
-                        <small class="text-muted float-end">
+                        <small class="text-muted"> R${{ $product->price; }}</small>
+                        <small class="text-muted float-right">
                             <a class="clean icon solid fa-edit" href="/product/{{ $product->id }}/edit"></a>
                             <a class="clean icon solid fa-trash" href="/product/{{ $product->id }}/delete" onclick="return confirm('Deletar esse intem?')"></a>
                         </small>
@@ -57,6 +61,29 @@
                 </a>
             </div>
         </div>
+        @else
+        <div class="col">
+            <div class="card bg-custom h-100">
+                <a class="clean" href="/product/{{  $product->id; }}/show">
+                    <img class="card-img-top" src="/images/{{ $product->image }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $product->name; }}</h5>
+                        <p class="card-text text-truncate">{{ $product->description; }}</p>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <small class="text-muted">saiba mais</small>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted"> R${{ $product->price; }}</small>
+                        <small class="text-muted float-right">
+                            <a class="clean icon solid fa-edit" href="/product/{{ $product->id }}/edit"></a>
+                            <a class="clean icon solid fa-trash" href="/product/{{ $product->id }}/delete" onclick="return confirm('Deletar esse intem?')"></a>
+                        </small>
+                    </div>
+                </a>
+            </div>
+        </div>
+        @endif
         @endforeach
     </div>
     <div class="d-flex justify-content-center">

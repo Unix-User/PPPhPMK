@@ -17,46 +17,36 @@ use MercadoPago\Payment;
 use MercadoPago\Preference;
 use MercadoPago\Item;
 
-
-
-
 class UserController extends Controller
 {
-    //
 
     public function index()
     {
-        // return all users in database and display in paginated view
         $users = User::paginate(10);
         return view('users.index', compact('users'));
     }
 
     public function create()
     {
-        // return view to create a new user
         $products = Product::all();
-        //find teams
         $teams = Team::all();
         return view('users.create', compact('products', 'teams'));
     }
 
     public function store(Request $request)
     {
-        //validate request
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
             'phone' => 'required|string|max:255|unique:users',
             'cep' => 'string|max:255',
             'rua' => 'string|max:255',
             'num' => 'string|max:255',
-            'etc' => 'string|max:255',
             'bairro' => 'string|max:255',
             'cidade' => 'string|max:255',
             'uf' => 'string|max:255',
             'url' => 'string|max:255',
-            'team_id' => 'required|exists:teams,id',
+            'product_id' => 'required',
             'api_key' => 'string|max:255',
             'expires_at' => 'string|max:255'
         ]);
@@ -75,35 +65,38 @@ class UserController extends Controller
         $user->url = $request->url;
         $user->api_key = $request->api_key;
         $user->expires_at = $request->expires_at;
-
-        /*
-        if (Auth::check()) {
-            $user->owner_id = Auth::user()->id;
+        if(!empty($request->password)) {
+            $request->validate([
+                'password' => 'required|string|min:6'
+            ]);
+            $user->password = bcrypt($request->password);
+        }
+        if (Product::count() > 0) {
+            $team = Product::find($request->product_id)->first()->tags;
         } else {
-            $user->owner_id = $user->id;
-        }*/
-
-        // user password bcrypt
-        $user->password = bcrypt($request->password);
-
+            if (User::count() == 0) {
+                $team = 1;
+            } else {
+                return redirect('/products')->with('error', 'Não existem produtos cadastrados');
+            }
+        }
         $user->save();
-        $user->teams()->sync($request->team_id);
+        $user->teams()->sync($team);
+        $user->contracts()->sync($request->product_id);
+
         return redirect('/users')->with('success', 'User created successfully');
     }
 
     public function show($id)
     {
-        // find user with id
         $user = User::find($id);
         return view('users.show', compact('user'));
     }
 
     public function edit($id)
     {
-        // return user with id
         $user = User::find($id);
         $products = Product::all();
-        // render view with user
         return view('users.edit', compact('user', 'products'));
     }
 
@@ -125,8 +118,6 @@ class UserController extends Controller
             'api_key' => 'string|max:255',
             'expires_at' => 'string|max:255',
         ]);
-
-        // update user with id
         $user = User::find($id);
         $user->name = $request->name;
         $user->email = $request->email;
@@ -141,27 +132,28 @@ class UserController extends Controller
         $user->url = $request->url;
         $user->api_key = $request->api_key;
         $user->expires_at = $request->expires_at;
-        /*
-        if (Auth::check()) {
-            $user->owner_id = Auth::user()->id;
-        } else {
-            $user->owner_id = $user->id;
-        }
-        */
         $user->password = bcrypt($request->password);
-
+        if (Product::count() > 0) {
+            $team = Product::find($request->product_id)->first()->tags;
+        } else {
+            if (User::count() == 0) {
+                $team = 1;
+            } else {
+                return redirect('/products')->with('error', 'Não existem produtos cadastrados');
+            }
+        }
         $user->save();
+        $user->teams()->sync($team);
         $user->contracts()->sync($request->product_id);
 
-        return redirect('/users');
+        return redirect('/users')->with('success', 'User updated successfully');
     }
 
     public function delete($id)
     {
-        // delete user with id
         $user = User::find($id);
         $user->delete();
-        return redirect('/users');
+        return redirect('/users')->with('success', 'User deleted successfully');
     }
 
     public function login()
@@ -176,7 +168,7 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
         if (Auth::attempt($credentials)) {
-            return redirect('/');
+            return redirect('/products');
         } else {
             return redirect('/login')->with('error', 'Invalid credentials');
         }
@@ -194,11 +186,9 @@ class UserController extends Controller
         ]);
         $user = User::where('email', $request->email)->first();
         if ($user) {
-            // generate token
             $token = Str::random(60);
             $user->remember_token = $token;
             $user->save();
-            // send email
             Mail::to($user)->send(new PasswordReset($user, $token));
             return redirect('/login')->with('success', 'Password reset link sent to your email');
         } else {
@@ -235,20 +225,14 @@ class UserController extends Controller
     public function payment($id)
     {
         $user = User::find($id);
-        // load SDK Mercado Pago and set access token
         SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
-
-        // Cria um objeto de preferência
         $preference = new Preference();
-
-        // Cria um item na preferência
         $item = new Item();
         $item->title = $user->contracts->first()->name;
         $item->quantity = 1;
         $item->unit_price = $user->contracts->first()->price;
         $preference->items = array($item);
         $preference->save();
-
         $payment = new Payment();
         $payment->transaction_amount = $user->contracts->first()->price;
         $payment->description = $user->contracts->first()->name;
@@ -271,7 +255,6 @@ class UserController extends Controller
             )
         );
         $payment->save();
-
         return view('users.checkout', compact('user', 'payment', 'preference'));
     }
 

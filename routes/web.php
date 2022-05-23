@@ -21,6 +21,13 @@ use App\Http\Controllers\PortfolioController;
 Route::get('/', function () {
     return view('landing');
 });
+
+// get status on url and render view notification passing the status
+Route::get('/notification/{status}', function ($status) {
+    return view('notification', ['status' => $status]);
+});
+
+
 Route::controller(UserController::class)->group(function () {
     Route::get('user/create', 'create');
     Route::post('user/store', 'store');

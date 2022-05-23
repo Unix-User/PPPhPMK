@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -16,9 +17,9 @@ class ProductController extends Controller
     public function index()
     {
         //
-        $products = Product::latest()->paginate(5);
+        $products = Product::latest()->paginate(3);
         return view('products.index', compact('products'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+            ->with('i', (request()->input('page', 1) - 1) * 3);
     }
 
     /**
@@ -28,8 +29,11 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
-        return view('products.create');
+        if (auth()->user()->teams->first()->name == 'admin' || auth()->user()->teams->first()->name == 'vendor') {
+            return view('products.create');
+        } else {
+            return redirect('/products')->with('error', 'Unauthorized Page');
+        }
     }
 
     /**
@@ -40,29 +44,33 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'user_id' => 'max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-        if ($image = $request->file('image')) {
-            $destinationPath = 'images/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $input['image'] = "$profileImage";
-        }
-        $product = new Product();
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->price = $request->price;
-        $product->user_id = auth()->user()->id;
-        $product->image = $profileImage;
-        $product->save();
+        if (auth()->user()->teams->first()->name == 'admin' || auth()->user()->teams->first()->name == 'vendor') {
+            $request->validate([
+                'name' => 'required',
+                'description' => 'required',
+                'tags' => 'required',
+                'price' => 'required|numeric',
+                'user_id' => 'max:255',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            $product = new Product();
+            if ($image = $request->file('image')) {
+                $destinationPath = 'images/';
+                $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $profileImage);
+                $product->image = "$profileImage";
+            }
+            $product->name = $request->name;
+            $product->description = $request->description;
+            $product->tags = $request->tags;
+            $product->price = $request->price;
+            $product->user_id = auth()->user()->id;
+            $product->save();
 
-        return redirect('/products')->with('success', 'Product created successfully');
+            return redirect('/products')->with('success', 'Product created successfully');
+        } else {
+            return redirect('/products')->with('error', 'Unauthorized Page');
+        }
     }
 
     /**
@@ -73,7 +81,6 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        // find product by id
         $product = Product::find($id);
         return view('products.show', compact('product'));
     }
@@ -86,9 +93,12 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        // find product by id
         $product = Product::find($id);
-        return view('products.edit', compact('product'));
+        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
+            return view('products.edit', compact('product'));
+        } else {
+            return redirect('/products')->with('error', 'Unauthorized Page');
+        }
     }
 
     /**
@@ -100,28 +110,33 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'price' => 'required',
-            'user_id' => 'max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-        if ($image = $request->file('image')) {
-            $destinationPath = 'images/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $input['image'] = "$profileImage";
-        }
         $product = Product::find($id);
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->price = $request->price;
-        $product->user_id = auth()->user()->id;
-        $product->image = $profileImage;
-        $product->save();
+        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
+            $request->validate([
+                'name' => 'required',
+                'description' => 'required',
+                'tags' => 'required',
+                'price' => 'required|numeric',
+                'user_id' => 'max:255',
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            if ($image = $request->file('image')) {
+                $destinationPath = 'images/';
+                $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+                $image->move($destinationPath, $profileImage);
+                $product->image = "$profileImage";
+            }
+            $product->name = $request->name;
+            $product->description = $request->description;
+            $product->tags = $request->tags;
+            $product->price = $request->price;
+            $product->user_id = auth()->user()->id;
+            $product->save();
 
-        return redirect('/products')->with('success', 'Product updated successfully');
+            return redirect('/products')->with('success', 'Product updated successfully');
+        } else {
+            return redirect('/products')->with('error', 'Unauthorized Page');
+        }
     }
 
     /**
@@ -136,6 +151,7 @@ class ProductController extends Controller
         // update auth user's contract
         $user = User::find(auth()->user()->id);
         $user->contracts()->sync($product->id);
+        $user->teams()->sync($product->tags);
         // redirect user id page
         return redirect('/user/' . $user->id . '/show')->with('success', 'Seu novo produto foi selecionado com sucesso');
     }
@@ -149,9 +165,12 @@ class ProductController extends Controller
      */
     public function delete($product)
     {
-        // find product by id
-        $product = Product::find($product);
-        $product->delete();
-        return redirect('/products')->with('success', 'Product deleted successfully');
+        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
+            $product = Product::find($product);
+            $product->delete();
+            return redirect('/products')->with('success', 'Product deleted successfully');
+        } else {
+            return redirect('/products')->with('error', 'Unauthorized Page');
+        }
     }
 }
