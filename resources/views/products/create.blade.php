@@ -3,7 +3,8 @@
 @section('title' , 'Criar produto')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+<!-- Adicionando JQuery    -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <style>
     #formImage {
         display: none;
@@ -103,9 +104,6 @@
 @endsection
 
 @push('scripts')
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script src="//malsup.github.io/jquery.form.js"></script>
-
 <script>
     /*função para enviar imagem em form do laravel*/
     $('#fileInput').click(function() {

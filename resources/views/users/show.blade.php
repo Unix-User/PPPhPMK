@@ -31,17 +31,17 @@
 <div class="card-deck">
     @if($user->contracts->count() > 0)
     <div class="card col-sm-4 bg-custom">
-        <a class="clean" href="/product/{{  $user->contracts->first()->id; }}/show">
+        <a class="clean" href="/product/{{  $user->contracts->last()->id; }}/show">
             <div class="card-header">
                 <span class="icon alt fa-wifi"></span>
-                <strong class="text-capitalize">{{ $user->contracts->first()->name }}</strong>
+                <strong class="text-capitalize">{{ $user->contracts->last()->name }}</strong>
             </div>
-            <img class="card-img-top" src="/images/{{ $user->contracts->first()->image }}" alt="Card image cap">
+            <img class="card-img-top" src="/images/{{ $user->contracts->last()->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text text-truncate">{{ $user->contracts->first()->description; }}
-                    <br />Técnico: <a href="/user/{{ $user->contracts->first()->user->id }}/show">{{ $user->contracts->first()->user->name }}</a>
+                <p class="card-text text-truncate">{{ $user->contracts->last()->description; }}
+                    <br />Técnico: <a href="/user/{{ $user->contracts->last()->user->id }}/show">{{ $user->contracts->last()->user->name }}</a>
                 </p>
-                <p class="card-text"><small class="text-muted"> R${{ $user->contracts->first()->price; }}</small></p>
+                <p class="card-text"><small class="text-muted"> R${{ $user->contracts->last()->price; }}</small></p>
             </div>
             <div class="card-footer">
                 <ul class="actions">
@@ -79,6 +79,7 @@
         <div class="card-body">
 
             <p class="card-text">
+
             <form action="/processar_pagamento" method="POST">
                 <ul>
                     <li><strong>Email: </strong>{{ $user->email }}</li>
@@ -90,6 +91,7 @@
                     <li><strong>Estado: </strong>{{ $user->uf }}</li>
                     <li><strong>Nº: </strong>{{ $user->num }}</li>
                     <li><strong>Complemento: </strong>{{ $user->complemento }}</li>
+                    <li><strong>team: </strong>{{ $user->teams()->first()->id }}-{{ $user->teams()->first()->name }}</li>
                 </ul>
             </form>
             </p>
@@ -109,14 +111,24 @@
     <div class="card col-sm-4 bg-custom">
         <div class="card-header">
             <span class="icon alt fa-history"></span>
-            <strong class="text-capitalize"> Registros de atividade</strong>
+            <strong class="text-capitalize"> Histórico de contratações</strong>
         </div>
-        <div class="card-body">
-            <p class="card-text">Os dados podem demorar até 10 minutos para serem atualizados com o servidor.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item bg-custom">Ultimos registros</li>
-        </ul>
+        <table class="card-body alt small">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($user->contracts as $contract)
+                <tr>
+                    <td>{{ $contract->name }}</td>
+                    <td>{{ $contract->updated_at }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
     <div class="card col-sm-8 bg-custom">
         <div class="card-header">

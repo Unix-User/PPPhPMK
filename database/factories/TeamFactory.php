@@ -17,7 +17,6 @@ class TeamFactory extends Factory
     public function definition()
     {
         return [
-            // assign user_id to team_id in in user_team pivot table
             'user_id' => $this->faker->numberBetween(1, 3),
         ];
     }

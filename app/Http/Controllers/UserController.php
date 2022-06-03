@@ -268,7 +268,7 @@ class UserController extends Controller
     {
 
         $user = User::find($id);
-        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
+        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
         $preference = new Preference();
         $item = new Item();
         $item->title = $user->contracts->last()->name;
@@ -310,7 +310,7 @@ class UserController extends Controller
         $log .= "\n" . date('Y-m-d H:i:s') . " - Nova requisição para processar pagamento";
         file_put_contents(public_path() . '/log2.txt', $request);
 
-        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
+        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
         switch($request->type) {
             case "payment":
                 $payment = Payment::find_by_id($request->data->id);

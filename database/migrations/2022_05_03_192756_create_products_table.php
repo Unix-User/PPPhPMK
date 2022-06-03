@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -36,8 +38,21 @@ return new class extends Migration
                 ->constrained()
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->string('reference')->nullable();
             $table->timestamps();
         });
+        
+
+        // insert some dummy data
+        $user = User::find(1);
+        $product = new Product();
+        $product->name = 'Painel de Controle';
+        $product->description = 'Dashboard para controle de vendas, clientes e produtos';
+        $product->image = 'banner.jpg';
+        $product->price = '150';
+        $product->user_id = $user->id;
+        $product->save();
+        $user->contracts()->attach(1);
     }
 
     /**

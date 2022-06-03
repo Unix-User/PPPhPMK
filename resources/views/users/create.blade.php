@@ -49,15 +49,15 @@
                     <span class="help-block">@foreach($errors->get('password') as $error){{ $error }}@endforeach</span>
                     @endif
                 </div>
-                <div class=" @if($errors->has('product_id')) has-error @endif col-md-3 col-md-offset-0">
+                <div class="@if($errors->has('product_id')) has-error @endif col-md-3 col-md-offset-0">
                     <label for="product_id">Plano</label>
                     <div class="select-wrapper">
                         <select name="product_id[]" class="form-control" placeholder="Selecione um plano">
                             @if(count($products) == 0)
-                            <option value="1">Nenhum plano cadastrado</option>
+                            <option value="">Nenhum plano cadastrado</option>
                             @else
                             @foreach($products as $product)
-                            <option value="{{ $product->id }}" @if(old('product_id')==$product->id) selected @endif>{{ $product->name }}</option>
+                            <option value="{{ $product->id }}" @if(old('product_id')==$product->id) selected @endif>{{ $product->user->id }} - {{ $product->name }}</option>
                             @endforeach
                             @endif
                         </select>
@@ -117,6 +117,25 @@
                     <input type="text" name="etc" id="etc" class="form-control" value="@if(old('etc')){{ old('etc') }}@endif" placeholder="Complemento" />
                     @if($errors->has('etc'))
                     <span class="help-block">{{ $errors->first('etc') }}</span>
+                    @endif
+                </div>
+                <!-- radio with admin, vendor and customer -->
+                <div class="@if($errors->has('role')) has-error @endif col-md-3 col-md-offset-0">
+                    <label for="role">Tipo de usuário</label>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadioInline1">Admin</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadioInline1">Vendedor</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadioInline2">Cliente</label>
+                    </div>
+                    @if($errors->has('role'))
+                    <span class="help-block">@foreach($errors->get('role') as $error){{ $error }}@endforeach</span>
                     @endif
                 </div>
                 <div class="col-md-3 col-md-offset-0">

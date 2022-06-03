@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->timestamps();
         });
-        // create 3 teams admin vendor and customer
-        App\Models\Team::create(['name' => 'admin']);
-        App\Models\Team::create(['name' => 'vendor']);
-        App\Models\Team::create(['name' => 'customer']);
-        
+
+
+        App\Models\Team::create(['name' => 'Administrador']);
+        App\Models\Team::create(['name' => 'Vendedor']);
+        App\Models\Team::create(['name' => 'Cliente']);
+
+
         Schema::create('team_user', function (Blueprint $table) {
             $table->string('team_id')
                 ->constrained()
@@ -34,6 +36,9 @@ return new class extends Migration
                 ->onUpdate('cascade');
             $table->timestamps();
         });
+
+        App\Models\User::find(1)->teams()->attach(1);
+        
     }
 
     /**

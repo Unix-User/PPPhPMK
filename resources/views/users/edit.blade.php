@@ -23,7 +23,6 @@
     @endforeach
 </div>
 @endif
-
 <section>
     <div class="panel-body">
         <form action="/user/{{ $user->id }}/update" method="POST">
@@ -51,16 +50,19 @@
                     <span class="help-block">{{ $errors->first('phone') }}</span>
                     @endif
                 </div>
-                <div class="@if($errors->has('cep')) has-error @endif col-md-3 col-md-offset-0">
-                    <label for="product_id">Produto</label>
-                    <select name="product_id" id="product_id" class="form-control">
-                        @foreach($products as $product)
-                        <option value="{{ $product->id }}" @if((isset($user->contracts->first()->id)) == $product->id) selected @endif>{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                    @if($errors->has('product_id'))
-                    <span class="help-block">{{ $errors->first('product_id') }}</span>
-                    @endif
+                <div class="@if($errors->has('product_id')) has-error @endif col-md-3 col-md-offset-0">
+                    <label for="product_id">Plano</label>
+                    <div class="select-wrapper">
+                        <select name="product_id[]" class="form-control" placeholder="Selecione um plano">
+                            @if(count($products) == 0)
+                            <option value="">Nenhum plano cadastrado</option>
+                            @else
+                            @foreach($products as $product)
+                            <option value="{{ $product->id }}" @if(isset($user->contracts->first()->product_id) == $product->id) selected @endif>{{ $product->name }}</option>
+                            @endforeach
+                            @endif
+                        </select>
+                    </div>
                 </div>
                 <div class="@if($errors->has('email')) has-error @endif col-md-12 col-md-offset-0">
                     <label for="email">E-mail</label>
@@ -129,73 +131,74 @@
             </div>
         </form>
     </div>
-    @endsection
+</section>
+@endsection
 
-    @push('scripts')
-    <!-- Adicionando Javascript -->
-    <script>
-        $(document).ready(function() {
+@push('scripts')
+<!-- Adicionando Javascript -->
+<script>
+    $(document).ready(function() {
 
-            function limpa_formulário_cep() {
-                // Limpa valores do formulário de cep.
-                $("#rua").val("");
-                $("#bairro").val("");
-                $("#cidade").val("");
-                $("#uf").val("");
-                $("#ibge").val("");
-            }
+        function limpa_formulário_cep() {
+            // Limpa valores do formulário de cep.
+            $("#rua").val("");
+            $("#bairro").val("");
+            $("#cidade").val("");
+            $("#uf").val("");
+            $("#ibge").val("");
+        }
 
-            //Quando o campo cep perde o foco.
-            $("#cep").blur(function() {
+        //Quando o campo cep perde o foco.
+        $("#cep").blur(function() {
 
-                //Nova variável "cep" somente com dígitos.
-                var cep = $(this).val().replace(/\D/g, '');
+            //Nova variável "cep" somente com dígitos.
+            var cep = $(this).val().replace(/\D/g, '');
 
-                //Verifica se campo cep possui valor informado.
-                if (cep != "") {
+            //Verifica se campo cep possui valor informado.
+            if (cep != "") {
 
-                    //Expressão regular para validar o CEP.
-                    var validacep = /^[0-9]{8}$/;
+                //Expressão regular para validar o CEP.
+                var validacep = /^[0-9]{8}$/;
 
-                    //Valida o formato do CEP.
-                    if (validacep.test(cep)) {
+                //Valida o formato do CEP.
+                if (validacep.test(cep)) {
 
-                        //Preenche os campos com "..." enquanto consulta webservice.
-                        $("#rua").val("...");
-                        $("#bairro").val("...");
-                        $("#cidade").val("...");
-                        $("#uf").val("...");
-                        $("#ibge").val("...");
+                    //Preenche os campos com "..." enquanto consulta webservice.
+                    $("#rua").val("...");
+                    $("#bairro").val("...");
+                    $("#cidade").val("...");
+                    $("#uf").val("...");
+                    $("#ibge").val("...");
 
-                        //Consulta o webservice viacep.com.br/
-                        $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+                    //Consulta o webservice viacep.com.br/
+                    $.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
 
-                            if (!("erro" in dados)) {
-                                //Atualiza os campos com os valores da consulta.
-                                $("#rua").val(dados.logradouro);
-                                $("#bairro").val(dados.bairro);
-                                $("#cidade").val(dados.localidade);
-                                $("#uf").val(dados.uf);
-                                $("#ibge").val(dados.ibge);
-                            } //end if.
-                            else {
-                                //CEP pesquisado não foi encontrado.
-                                limpa_formulário_cep();
-                                alert("CEP não encontrado.");
-                            }
-                        });
-                    } //end if.
-                    else {
-                        //cep é inválido.
-                        limpa_formulário_cep();
-                        alert("Formato de CEP inválido.");
-                    }
+                        if (!("erro" in dados)) {
+                            //Atualiza os campos com os valores da consulta.
+                            $("#rua").val(dados.logradouro);
+                            $("#bairro").val(dados.bairro);
+                            $("#cidade").val(dados.localidade);
+                            $("#uf").val(dados.uf);
+                            $("#ibge").val(dados.ibge);
+                        } //end if.
+                        else {
+                            //CEP pesquisado não foi encontrado.
+                            limpa_formulário_cep();
+                            alert("CEP não encontrado.");
+                        }
+                    });
                 } //end if.
                 else {
-                    //cep sem valor, limpa formulário.
+                    //cep é inválido.
                     limpa_formulário_cep();
+                    alert("Formato de CEP inválido.");
                 }
-            });
+            } //end if.
+            else {
+                //cep sem valor, limpa formulário.
+                limpa_formulário_cep();
+            }
         });
-    </script>
-    @endpush
+    });
+</script>
+@endpush
