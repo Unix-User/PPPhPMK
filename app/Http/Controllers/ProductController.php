@@ -29,7 +29,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        if (auth()->user()->teams->first()->name == 'admin' || auth()->user()->teams->first()->name == 'vendor') {
+        if (auth()->user()->teams->first()->id == '1') {
             return view('products.create');
         } else {
             return redirect('/products')->with('error', 'Unauthorized Page');
@@ -44,7 +44,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if (auth()->user()->teams->first()->name == 'admin' || auth()->user()->teams->first()->name == 'vendor') {
+        if (auth()->user()->teams->first()->id == '1') {
             $request->validate([
                 'name' => 'required',
                 'description' => 'required',
@@ -94,11 +94,10 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::find($id);
-        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
+        if (auth()->user()->id == '1' || auth()->user()->id == $product->user_id) {
             return view('products.edit', compact('product'));
-        } else {
-            return redirect('/products')->with('error', 'Unauthorized Page');
         }
+        return redirect('/products')->with('error', 'Unauthorized Page');
     }
 
     /**
@@ -111,7 +110,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
-        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
+        if (auth()->user()->id == '1' || auth()->user()->id == $product->user_id) {
             $request->validate([
                 'name' => 'required',
                 'description' => 'required',
@@ -150,8 +149,14 @@ class ProductController extends Controller
         $product = Product::find($id);
         // update auth user's contract
         $user = User::find(auth()->user()->id);
+        $team = Team::find($product->user->id);
+        if (!$team) {
+            $team = new Team;
+            $team->name = $product->user->name;
+            $team->save();
+        }
         $user->contracts()->sync($product->id);
-        $user->teams()->sync($product->tags);
+        $user->teams()->sync($team);
         // redirect user id page
         return redirect('/user/' . $user->id . '/show')->with('success', 'Seu novo produto foi selecionado com sucesso');
     }
@@ -163,14 +168,13 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function delete($product)
+    public function delete($id)
     {
-        if (auth()->user()->teams->first()->name == 'admin' || $product->user_id == auth()->user()->id) {
-            $product = Product::find($product);
+        $product = Product::where('id', $id)->first();
+        if ($product->user_id == auth()->user()->id || auth()->user()->id == '1') {
             $product->delete();
             return redirect('/products')->with('success', 'Product deleted successfully');
-        } else {
-            return redirect('/products')->with('error', 'Unauthorized Page');
         }
+        return redirect('/products')->with('error', 'Unauthorized Page');
     }
 }

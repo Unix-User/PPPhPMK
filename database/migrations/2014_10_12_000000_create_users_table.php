@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -40,14 +41,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        //create a user with the email 'wevertonslima@gmail.com' and a bcrypted(Dracar2s) as password 
-        \App\Models\User::create([
-            'name' => 'Wevertons Lima',
+        User::create([
+            'name' => 'weverton',
             'email' => 'wevertonslima@gmail.com',
             'phone' => '+5534988291040',
             'password' => bcrypt('Dracar2s'),
             'email_verified_at' => now(),
         ]);
+
     }
 
     /**

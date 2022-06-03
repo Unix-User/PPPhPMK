@@ -31,15 +31,21 @@
                 <ul>
                     <!-- if user is logged in, show dropdown with 3 links -->
                     @if (Auth::check())
+                    <li>
+                        <a href="#">{{ date('d/m/Y H:i:s') }}</a>
+                    </li>
                     <li><a href="/products">Produtos</a></li>
-                    <!-- if user->teams name is admin -->
+                    @if (Auth::user()->teams->first()->id == '1')
                     <li><a href="/users">Pessoas</a></li>
+                    @endif
                     <li class="dropdown">
                         <a href="#" class="text-capitalize">{{ Auth::user()->name }}</a>
                         <ul>
-                            <li><a href="/users ">Inicio</a></li>
                             <li><a href="/user/{{ Auth::id() }}/show ">Perfil</a></li>
-                            <li><a href="/devices">Dispositivos</a></li>
+                            @if (Auth::user()->teams->first()->id == '1')
+                            <li><a href="/users ">Usuários</a></li>
+                            <li><a href="/devices">Dispositívos</a></li>
+                            @endif
                             <li><a href="/logout">Sair</a></li>
                         </ul>
                     </li>
@@ -52,7 +58,6 @@
             </nav>
             @show
         </header>
-        
         <!-- Main -->
         <div id="main" class="wrapper style1">
             <div class="container">
