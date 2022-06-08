@@ -38,8 +38,8 @@
                 <th class="d-none d-lg-table-cell"><a href="mailto:{{ $user->email; }}" class="icon alt fa-envelope"><span class="label">Email</span></a> {{ $user->email; }}</th>
                 <th class="d-none d-lg-table-cell">
                     @if($user->contracts->last())
-                    {{ $user->contracts->last()->id; }} -
-                    {{ $user->contracts->last()->name; }}
+                    {{ $user->contracts->last()->product->id; }} -
+                    {{ $user->contracts->last()->product->name; }}
                     @endif
                 </th>
                 <th class="d-none d-lg-table-cell">

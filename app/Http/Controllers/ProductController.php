@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contract;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Ramsey\Uuid\Uuid;
 
 class ProductController extends Controller
 {
@@ -155,7 +157,7 @@ class ProductController extends Controller
             $team->name = $product->user->name;
             $team->save();
         }
-        $user->contracts()->sync($product->id);
+        $user->contracts()->attach($product->id, ['reference' => Uuid::uuid4(), 'created_at' => now()]);
         $user->teams()->sync($team);
         // redirect user id page
         return redirect('/user/' . $user->id . '/show')->with('success', 'Seu novo produto foi selecionado com sucesso');

@@ -89,7 +89,7 @@
 <script src="https://sdk.mercadopago.com/js/v2"></script>
 <script>
     // Adicione as credenciais do SDK
-    const mp = new MercadoPago('{{env("MP_PUB_KEY")}}', {
+    const mp = new MercadoPago('{{env("Test_MP_PUB_KEY")}}', {
         locale: 'pt-BR'
     });
 

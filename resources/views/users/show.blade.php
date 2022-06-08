@@ -31,17 +31,17 @@
 <div class="card-deck">
     @if($user->contracts->count() > 0)
     <div class="card col-sm-4 bg-custom">
-        <a class="clean" href="/product/{{  $user->contracts->last()->id; }}/show">
+        <a class="clean" href="/product/{{  $user->contracts->last()->product->id; }}/show">
             <div class="card-header">
                 <span class="icon alt fa-wifi"></span>
-                <strong class="text-capitalize">{{ $user->contracts->last()->name }}</strong>
+                <strong class="text-capitalize">{{ $user->contracts->last()->product->name }}</strong>
             </div>
-            <img class="card-img-top" src="/images/{{ $user->contracts->last()->image }}" alt="Card image cap">
+            <img class="card-img-top" src="/images/{{ $user->contracts->last()->product->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text text-truncate">{{ $user->contracts->last()->description; }}
-                    <br />Técnico: <a href="/user/{{ $user->contracts->last()->user->id }}/show">{{ $user->contracts->last()->user->name }}</a>
+                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description; }}
+                    <br />Técnico: <a href="/user/{{ $user->contracts->last()->product->user->id }}/show">{{ $user->contracts->last()->user->name }}</a>
                 </p>
-                <p class="card-text"><small class="text-muted"> R${{ $user->contracts->last()->price; }}</small></p>
+                <p class="card-text"><small class="text-muted"> R${{ $user->contracts->last()->product->price; }}</small></p>
             </div>
             <div class="card-footer">
                 <ul class="actions">
@@ -108,7 +108,7 @@
 </div>
 <hr />
 <div class="card-deck">
-    <div class="card col-sm-4 bg-custom">
+    <div class="card bg-custom">
         <div class="card-header">
             <span class="icon alt fa-history"></span>
             <strong class="text-capitalize"> Histórico de contratações</strong>
@@ -117,20 +117,27 @@
             <thead>
                 <tr>
                     <th>Nome</th>
+                    <th>reference</th>
                     <th>Data</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($user->contracts as $contract)
                 <tr>
-                    <td>{{ $contract->name }}</td>
+                    <td>{{ isset($contract->product) ? $contract->product->name : 'null' ; }}</td>
+                    <td>{{ $contract->reference }}</td>
+                    <td>{{ $contract->created_at }}</td>
                     <td>{{ $contract->updated_at }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
-    <div class="card col-sm-8 bg-custom">
+</div>
+<hr />
+<div class="card-deck">
+<div class="card col-sm-8 bg-custom">
         <div class="card-header">
             <span class="icon alt fa-chart-bar"></span>
             <strong class="text-capitalize"> Graficos de consumo</strong>

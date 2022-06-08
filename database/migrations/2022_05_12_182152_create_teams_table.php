@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Ramsey\Uuid\Uuid;
 
 return new class extends Migration
 {
@@ -19,12 +20,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-
-        App\Models\Team::create(['name' => 'Administrador']);
-        App\Models\Team::create(['name' => 'Vendedor']);
-        App\Models\Team::create(['name' => 'Cliente']);
-
-
         Schema::create('team_user', function (Blueprint $table) {
             $table->string('team_id')
                 ->constrained()
@@ -37,7 +32,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        App\Models\Team::create(['name' => 'Administrador']);
         App\Models\User::find(1)->teams()->attach(1);
+        App\Models\User::find(1)->contracts()->create(['user_id' => 1, 'product_id' => 1, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
         
     }
 
@@ -49,5 +46,6 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('teams');
+        Schema::dropIfExists('team_user');
     }
 };
