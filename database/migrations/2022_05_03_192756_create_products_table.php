@@ -52,7 +52,7 @@ return new class extends Migration
         $product->price = '150';
         $product->user_id = $user->id;
         $product->save();
-        $user->contracts()->attach(1);
+        
     }
 
     /**

@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function contracts()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->hasMany(Contract::class);
     }
 
     public function products()

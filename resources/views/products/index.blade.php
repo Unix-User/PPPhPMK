@@ -12,11 +12,9 @@
     <p>Aqui voce obtem informções detalhadas sobre produtos e serviços</p>
 </header>
 <div>
-    <!-- if any alert messages -->
     @if(session()->has('success'))
     <div class="alert alert-success" style="width: 100%; position: relative; background-color: #272833; border-color: #155724" role="alert">
         {{ session()->get('success') }}
-        <!-- close alert button -->
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -25,7 +23,6 @@
     @if(session()->has('error'))
     <div class="alert alert-danger" style="width: 100%; position: relative; background-color: #272833; border-color: #843534" role="alert">
         {{ session()->get('error') }}
-        <!-- close alert button -->
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

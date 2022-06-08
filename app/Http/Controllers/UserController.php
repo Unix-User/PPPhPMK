@@ -12,6 +12,7 @@ use App\Models\Device;
 use App\Models\Team;
 use App\Models\Contract;
 use App\Mail\PasswordReset;
+use Illuminate\Support\Arr;
 use MercadoPago\SDK;
 use MercadoPago\Payment;
 use MercadoPago\Preference;
@@ -20,6 +21,8 @@ use MercadoPago\Invoice;
 use MercadoPago\Plan;
 use MercadoPago\Subscription;
 use MercadoPago\MerchantOrder;
+use MercadoPago\Payer;
+use Ramsey\Uuid\Uuid;
 
 
 class UserController extends Controller
@@ -94,7 +97,7 @@ class UserController extends Controller
             }
             $user->save();
             $user->teams()->sync($team, ['created_at' => now()]);
-            $user->contracts()->sync($request->product_id, ['created_at' => now()]);
+            $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
             return redirect('/users')->with('success', 'User created successfully');
         }
         return redirect('/users')->with('error', 'You are not authorized to create users');
@@ -184,7 +187,7 @@ class UserController extends Controller
         }
         $user->save();
         $user->teams()->sync($team, ['updated_at' => now()]);
-        $user->contracts()->attach($request->product_id, ['reference' => now(), 'created_at' => now()]);
+        $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
         return redirect('/users')->with('success', 'User updated successfully');
     }
 
@@ -266,23 +269,27 @@ class UserController extends Controller
 
     public function payment($id)
     {
-
         $user = User::find($id);
-        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
+        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
         $preference = new Preference();
         $item = new Item();
         $item->title = $user->contracts->last()->name;
         $item->quantity = 1;
         $item->unit_price = $user->contracts->last()->price;
         $preference->items = array($item);
-        $preference->external_reference = $user->contracts->last()->id;
+        $preference->external_reference = $user->contracts->last()->reference;
+        $preference->back_urls = (object) [
+            "success" => env('APP_URL') . "/users/" . $user->id . "/show",
+            "failure" => env('APP_URL') . "/users/" . $user->id . "/show",
+            "pending" => env('APP_URL') . "/users/" . $user->id . "/show"
+        ];
         $preference->save();
 
         $payment = new Payment();
         $payment->transaction_amount = $user->contracts->last()->price;
         $payment->description = $user->contracts->last()->name;
         $payment->payment_method_id = "pix";
-        $payment->external_reference = $user->contracts->last()->id;
+        $payment->external_reference = $user->contracts->last()->reference;
         $payment->payer = array(
             "email" => $user->email,
             "first_name" => $user->name,
@@ -305,42 +312,44 @@ class UserController extends Controller
 
     public function processar_pagamento(Request $request)
     {
+        file_put_contents(public_path() . '/log2.txt', json_encode($request->all()));
+
+        $json = json_decode(json_encode($request->all()));
 
         $log = file_get_contents(public_path() . '/log.txt');
         $log .= "\n" . date('Y-m-d H:i:s') . " - Nova requisição para processar pagamento";
-        file_put_contents(public_path() . '/log2.txt', $request);
-
-        SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
-        switch($request->type) {
+        $log .= "\n type=" . $json->type;
+        $log .= "\n data.id=" . $json->data->id;
+        $log .= "\n id=" . $json->id;
+        $log .= "\n user=" . $json->user_id;
+        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
+        switch ($json->type) {
             case "payment":
-                $payment = Payment::find_by_id($request->data->id);
-                $log .= "\n" . date('Y-m-d H:i:s') . " - Pagamento encontrado";
-                if ($payment->status == "approved") {
-                    $log .= "\n" . "Pagamento aprovado";
-                    $contract = Contract::find($payment->external_reference);
-                    $contract->sync([
-                        'reference' => 'paid',
-                        'updated_at' => now()
-                    ]);
-                    $log .= "\n" . "Sistema liberado";
-                } else {
-                    $log .= "\n" . "Pagamento não aprovado";
-                }
+                $payment = Payment::find_by_id($json->data->id);
+                $contract = Contract::where('reference', $payment->external_reference)->last();
+                $contract->sync(['updated_at' => now()]);
                 break;
             case "plan":
-                $plan = Plan::find_by_id($request->data->id);
+                $plan = Plan::find_by_id($json->data->id);
+                $contract = Contract::where('reference', $plan->external_reference)->last();
+                $contract->sync(['updated_at' => now()]);
                 break;
-            case "subscription":
-                $plan = Subscription::find_by_id($request->data->id);
+            case 'subscription':
+                $plan = Subscription::find_by_id($json->data->id);
+                $contract = Contract::where('reference', $plan->external_reference)->last();
+                $contract->sync(['updated_at' => now()]);
                 break;
-            case "invoice":
-                $plan = Invoice::find_by_id($request->data->id);
+            case 'invoice':
+                $plan = Invoice::find_by_id($json->data->id);
+                $contract = Contract::where('reference', $plan->external_reference)->last();
+                $contract->sync(['updated_at' => now()]);
                 break;
             case "point_integration_wh":
                 // $_POST contém as informações relacionadas à notificação.
-                break; 
+                break;
         }
         file_put_contents(public_path() . '/log.txt', $log);
+        return response()->json(['status' => 'ok'], 201);
     }
 
     public function logout()
