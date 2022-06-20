@@ -10,7 +10,7 @@ class Team extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'name', 'password', 'mode'
     ];
 
     public function users()

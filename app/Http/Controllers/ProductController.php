@@ -151,13 +151,13 @@ class ProductController extends Controller
         $product = Product::find($id);
         // update auth user's contract
         $user = User::find(auth()->user()->id);
-        $team = Team::find($product->user->id);
+        $team = Team::where('name', $product->user->name)->first();
         if (!$team) {
             $team = new Team;
             $team->name = $product->user->name;
             $team->save();
         }
-        $user->contracts()->attach($product->id, ['reference' => Uuid::uuid4(), 'created_at' => now()]);
+        $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now(), 'updated_at' => null]);
         $user->teams()->sync($team);
         // redirect user id page
         return redirect('/user/' . $user->id . '/show')->with('success', 'Seu novo produto foi selecionado com sucesso');

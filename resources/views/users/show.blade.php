@@ -134,7 +134,7 @@
             </tbody>
         </table>
     </div>
-</div>
+</div><!-- future fearures
 <hr />
 <div class="card-deck">
 <div class="card col-sm-8 bg-custom">
@@ -146,5 +146,5 @@
             <div id="linhas" style="width: 100%; height: auto;"></div>
         </div>
     </div>
-</div>
+</div> -->
 @endsection

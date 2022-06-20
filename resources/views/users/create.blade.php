@@ -35,18 +35,18 @@
                     <span class="help-block">@foreach($errors->get('name') as $error){{ $error }}@endforeach</span>
                     @endif
                 </div>
-                <div class=" @if($errors->has('phone')) has-error @endif col-md-3 col-md-offset-0">
-                    <label for="title">Telefone</label>
-                    <input type="text" name="phone" class="form-control" value="@if(old('phone')){{ old('phone') }}@endif" placeholder="Telefone" />
-                    @if($errors->has('phone'))
-                    <span class="help-block">@foreach($errors->get('phone') as $error){{ $error }}@endforeach</span>
-                    @endif
-                </div>
                 <div class=" @if($errors->has('password')) has-error @endif col-md-3 col-md-offset-0">
                     <label for="title">Senha</label>
                     <input type="password" name="password" class="form-control" value="@if(old('password')){{ old('password') }}@endif" placeholder="Senha" />
                     @if($errors->has('password'))
                     <span class="help-block">@foreach($errors->get('password') as $error){{ $error }}@endforeach</span>
+                    @endif
+                </div>
+                <div class=" @if($errors->has('phone')) has-error @endif col-md-3 col-md-offset-0">
+                    <label for="title">Telefone</label>
+                    <input type="text" name="phone" class="form-control" value="@if(old('phone')){{ old('phone') }}@endif" placeholder="Telefone" />
+                    @if($errors->has('phone'))
+                    <span class="help-block">@foreach($errors->get('phone') as $error){{ $error }}@endforeach</span>
                     @endif
                 </div>
                 <div class="@if($errors->has('product_id')) has-error @endif col-md-3 col-md-offset-0">
@@ -117,25 +117,6 @@
                     <input type="text" name="etc" id="etc" class="form-control" value="@if(old('etc')){{ old('etc') }}@endif" placeholder="Complemento" />
                     @if($errors->has('etc'))
                     <span class="help-block">{{ $errors->first('etc') }}</span>
-                    @endif
-                </div>
-                <!-- radio with admin, vendor and customer -->
-                <div class="@if($errors->has('role')) has-error @endif col-md-3 col-md-offset-0">
-                    <label for="role">Tipo de usuário</label>
-                    <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
-                        <label class="custom-control-label" for="customRadioInline1">Admin</label>
-                    </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
-                        <label class="custom-control-label" for="customRadioInline1">Vendedor</label>
-                    </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
-                        <label class="custom-control-label" for="customRadioInline2">Cliente</label>
-                    </div>
-                    @if($errors->has('role'))
-                    <span class="help-block">@foreach($errors->get('role') as $error){{ $error }}@endforeach</span>
                     @endif
                 </div>
                 <div class="col-md-3 col-md-offset-0">

@@ -11,7 +11,10 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^3.4",
-        "mercadopago/dx-php": "^2.4"
+        "mercadopago/dx-php": "^2.4",
+        "pear2/cache_shm": "^0.2.0",
+        "pear2/net_routeros": "dev-develop@dev",
+        "pear2/net_transmitter": "1.0.0b1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -23,6 +23,7 @@ use MercadoPago\Subscription;
 use MercadoPago\MerchantOrder;
 use MercadoPago\Payer;
 use Ramsey\Uuid\Uuid;
+use PEAR2\Net\RouterOS;
 
 
 class UserController extends Controller
@@ -89,7 +90,7 @@ class UserController extends Controller
             if (!$product) {
                 return redirect('/product/create')->with('error', 'Cadastre um produto primeiro!');
             }
-            $team = Team::where('id', $product->user->id)->first();
+            $team = Team::where('name', $product->user->name)->first();
             if (!$team) {
                 $team = new Team;
                 $team->name = $product->user->name;
@@ -97,7 +98,7 @@ class UserController extends Controller
             }
             $user->save();
             $user->teams()->sync($team, ['created_at' => now()]);
-            $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
+            $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now(), 'updated_at' => null]);
             return redirect('/users')->with('success', 'User created successfully');
         }
         return redirect('/users')->with('error', 'You are not authorized to create users');
@@ -179,7 +180,7 @@ class UserController extends Controller
         if (!$product) {
             return redirect('/product/create')->with('error', 'Cadastre um produto primeiro!');
         }
-        $team = Team::where('id', $product->user->id)->first();
+        $team = Team::where('name', $product->user->name)->first();
         if (!$team) {
             $team = new Team;
             $team->name = $product->user->name;
@@ -270,26 +271,38 @@ class UserController extends Controller
     public function payment($id)
     {
         $user = User::find($id);
-        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
+        if ($user->contracts->last()->updated_at > now()->subMinutes(2)) {
+            return redirect()->back()->with('error', 'Seu contrato ainda está ativo volte daqui ' . now()->subMinutes(2)->diffForHumans());
+        }
+        $token = env('MP_ACCESS_TOKEN');
+        $key = env('MP_PUB_KEY');
+        if ($user->teams->last()->mode == 'dev') {
+            $token = env('Test_MP_ACCESS_TOKEN');
+            $key = env('Test_MP_PUB_KEY');
+        }
+        SDK::setAccessToken($token);
         $preference = new Preference();
         $item = new Item();
-        $item->title = $user->contracts->last()->name;
+        $item->title = $user->contracts->last()->product->name;
         $item->quantity = 1;
-        $item->unit_price = $user->contracts->last()->price;
+        $item->unit_price = $user->contracts->last()->product->price;
         $preference->items = array($item);
         $preference->external_reference = $user->contracts->last()->reference;
+        $preference->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks';
         $preference->back_urls = (object) [
-            "success" => env('APP_URL') . "/users/" . $user->id . "/show",
-            "failure" => env('APP_URL') . "/users/" . $user->id . "/show",
-            "pending" => env('APP_URL') . "/users/" . $user->id . "/show"
+            "success" => env('APP_URL') . "/user/" . $user->id . "/show",
+            "failure" => env('APP_URL') . "/user/" . $user->id . "/show",
+            "pending" => env('APP_URL') . "/user/" . $user->id . "/show"
         ];
+        $preference->auto_return = "approved";
         $preference->save();
 
         $payment = new Payment();
-        $payment->transaction_amount = $user->contracts->last()->price;
-        $payment->description = $user->contracts->last()->name;
+        $payment->transaction_amount = $user->contracts->last()->product->price;
+        $payment->description = $user->contracts->last()->product->name;
         $payment->payment_method_id = "pix";
         $payment->external_reference = $user->contracts->last()->reference;
+        $payment->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks';
         $payment->payer = array(
             "email" => $user->email,
             "first_name" => $user->name,
@@ -305,51 +318,44 @@ class UserController extends Controller
         );
         $payment->save();
 
-        $log = file_get_contents(public_path() . '/log.txt');
-
-        return view('users.checkout', compact('user', 'payment', 'preference', 'log'));
+        return view('users.checkout', compact('user', 'payment', 'preference', 'key'));
     }
 
     public function processar_pagamento(Request $request)
     {
-        file_put_contents(public_path() . '/log2.txt', json_encode($request->all()));
-
-        $json = json_decode(json_encode($request->all()));
-
-        $log = file_get_contents(public_path() . '/log.txt');
-        $log .= "\n" . date('Y-m-d H:i:s') . " - Nova requisição para processar pagamento";
-        $log .= "\n type=" . $json->type;
-        $log .= "\n data.id=" . $json->data->id;
-        $log .= "\n id=" . $json->id;
-        $log .= "\n user=" . $json->user_id;
-        SDK::setAccessToken(env('Test_MP_ACCESS_TOKEN'));
-        switch ($json->type) {
+        $input = $request->all();
+        $token = env('MP_ACCESS_TOKEN');
+        if (User::find(1)->teams->first()->mode == 'dev') {
+            $token = env('Test_MP_ACCESS_TOKEN');
+        }
+        $log = 'nova requisição:'.$input["data"]["id"];
+        SDK::setAccessToken($token);
+        switch ($input["type"]) {
             case "payment":
-                $payment = Payment::find_by_id($json->data->id);
-                $contract = Contract::where('reference', $payment->external_reference)->last();
-                $contract->sync(['updated_at' => now()]);
+                $payment = Payment::find_by_id($input["data"]["id"]);
+                if ($payment->status == "approved") {
+                    $contract = Contract::where('reference', $payment->external_reference);
+                    $contract->update(['updated_at' => $payment->date_approved]);
+                    $log = "\n" . $contract->updated_at . " - contrato " . $payment->external_reference . " - status do pagamento:" . $payment->status;
+                }
                 break;
             case "plan":
-                $plan = Plan::find_by_id($json->data->id);
-                $contract = Contract::where('reference', $plan->external_reference)->last();
-                $contract->sync(['updated_at' => now()]);
+                $plan = Plan::find_by_id($input["data"]["id"]);
                 break;
-            case 'subscription':
-                $plan = Subscription::find_by_id($json->data->id);
-                $contract = Contract::where('reference', $plan->external_reference)->last();
-                $contract->sync(['updated_at' => now()]);
+            case "subscription":
+                $plan = Subscription::find_by_id($input["data"]["id"]);
                 break;
-            case 'invoice':
-                $plan = Invoice::find_by_id($json->data->id);
-                $contract = Contract::where('reference', $plan->external_reference)->last();
-                $contract->sync(['updated_at' => now()]);
+            case "invoice":
+                $plan = Invoice::find_by_id($input["data"]["id"]);
                 break;
             case "point_integration_wh":
                 // $_POST contém as informações relacionadas à notificação.
                 break;
         }
+        $log .= "\n" . $request->all() . "\n";
+        $log .= file_get_contents(public_path() . '/log.txt');
         file_put_contents(public_path() . '/log.txt', $log);
-        return response()->json(['status' => 'ok'], 201);
+        return response()->json(['status' => 'created'], 201);
     }
 
     public function logout()
@@ -357,4 +363,106 @@ class UserController extends Controller
         Auth::logout();
         return redirect('/login');
     }
+
+    public function system()
+    {
+
+        $log = file_get_contents(public_path() . '/log.txt');
+        $users = User::all();
+        $teams = Team::all();
+        $products = Product::all();
+        $contracts = Contract::all();
+        return view('users.system', compact('users', 'products', 'contracts', 'log', 'teams'));
+    }
+
+    public function config(Request $request, $id)
+    {
+        $user = User::find($id);
+        $team = Team::where('name', $user->name)->first();
+        if (!$team) {
+            $team = new Team;
+            $team->name = $user->name;
+            $team->save();
+        }
+        $password = $team->password;
+        if ($request->password) {
+            $request->validate([
+                'password' => ['required', 'string', 'min:2'],
+            ]);
+            $password = $request->password;
+        }
+        $team->password = $password;
+        $team->mode = $request->mercado_pago;
+        $team->save();
+        return redirect()->back()->with('success', 'Configurações atualizadas com sucesso - ' . $team->mode . '-' . $request->mercado_pago);
+    }
+
+    public function disconnect($name)
+    {
+        $devices = Device::all();
+        foreach ($devices as $device) {
+            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+            $printRequest = new RouterOS\Request('/ppp active print');
+            $printRequest->setArgument('.proplist', '.id');
+            $printRequest->setQuery(RouterOS\Query::where('name', $name));
+            $id = $client->sendSync($printRequest)->getProperty('.id');
+
+            $request = new RouterOS\Request('/ppp active remove');
+            $request->setArgument('numbers', $id);
+            $client->sendSync($request);
+        }
+        return redirect()->back()->with('success', 'Desconectado com sucesso');
+    }
+
+    public function disable($name)
+    {
+        $devices = Device::all();
+        foreach ($devices as $device) {
+            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+            $printRequest = new RouterOS\Request('/ppp secret print');
+            $printRequest->setArgument('.proplist', '.id');
+            $printRequest->setQuery(RouterOS\Query::where('name', $name));
+            $id = $client->sendSync($printRequest)->getProperty('.id');
+
+            $request = new RouterOS\Request('/ppp secret disable');
+            $request->setArgument('numbers', $id);
+            $client->sendSync($request);
+        }
+        return redirect()->back()->with('success', 'Desativado com sucesso');
+    }
+
+    public function enable($name)
+    {
+        $devices = Device::all();
+        foreach ($devices as $device) {
+            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+            $printRequest = new RouterOS\Request('/ppp secret print');
+            $printRequest->setArgument('.proplist', '.id');
+            $printRequest->setQuery(RouterOS\Query::where('name', $name));
+            $id = $client->sendSync($printRequest)->getProperty('.id');
+
+            $request = new RouterOS\Request('/ppp secret enable');
+            $request->setArgument('numbers', $id);
+            $client->sendSync($request);
+        }
+        return redirect()->back()->with('success', 'Ativado com sucesso');
+    }
+
+    public function remove($name)
+    {
+        $devices = Device::all();
+        foreach ($devices as $device) {
+            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+            $printRequest = new RouterOS\Request('/ppp secret print');
+            $printRequest->setArgument('.proplist', '.id');
+            $printRequest->setQuery(RouterOS\Query::where('name', $name));
+            $id = $client->sendSync($printRequest)->getProperty('.id');
+
+            $request = new RouterOS\Request('/ppp secret remove');
+            $request->setArgument('numbers', $id);
+            $client->sendSync($request);
+        }
+        return redirect()->back()->with('success', 'Removido com sucesso');
+    }
+
 }
