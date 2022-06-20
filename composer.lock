@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5790a42fafb67f905c46b1e9546de84f",
+    "content-hash": "ae9a886acb3dcd5faf390ce8ab7fc6be",
     "packages": [
         {
             "name": "brick/math",
@@ -2534,6 +2534,204 @@
                 "source": "https://github.com/nikic/PHP-Parser/tree/v4.13.2"
             },
             "time": "2021-11-30T19:35:32+00:00"
+        },
+        {
+            "name": "pear2/cache_shm",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear2/Cache_SHM.git",
+                "reference": "1de608d1b59df5ba55172ba727b1da581e1497eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear2/Cache_SHM/zipball/1de608d1b59df5ba55172ba727b1da581e1497eb",
+                "reference": "1de608d1b59df5ba55172ba727b1da581e1497eb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "suggest": {
+                "ext-apc": ">=5.0.0",
+                "ext-wincache": ">=1.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PEAR2\\Cache\\SHM": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Vasil Rangelov",
+                    "email": "boen.robot@gmail.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "Wrapper for shared memory and locking functionality across different PHP extensions.",
+            "homepage": "http://pear2.github.com/Cache_SHM/",
+            "keywords": [
+                "abstraction",
+                "apc",
+                "cache",
+                "caching",
+                "lock",
+                "locking",
+                "pear2",
+                "shm",
+                "wincache"
+            ],
+            "support": {
+                "issues": "http://github.com/pear2/Cache_SHM/issues",
+                "source": "https://github.com/pear2/Cache_SHM/tree/develop",
+                "wiki": "http://github.com/pear2/Cache_SHM/wiki"
+            },
+            "time": "2016-11-07T02:09:36+00:00"
+        },
+        {
+            "name": "pear2/net_routeros",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear2/Net_RouterOS.git",
+                "reference": "40466961229f641e2cccbe84f5db6fe0d01fef6e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear2/Net_RouterOS/zipball/40466961229f641e2cccbe84f5db6fe0d01fef6e",
+                "reference": "40466961229f641e2cccbe84f5db6fe0d01fef6e",
+                "shasum": ""
+            },
+            "require": {
+                "pear2/net_transmitter": ">=1.0.0b1 || dev-develop@dev",
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "ext-iconv": "*",
+                "pear2/cache_shm": "dev-develop",
+                "pear2/console_color": "dev-develop",
+                "pear2/console_commandline": "dev-master",
+                "pear2/net_transmitter": "dev-develop@dev",
+                "phpunit/phpunit": "^5.0.0",
+                "phpunit/phpunit-mock-objects": "^3.4.0",
+                "squizlabs/php_codesniffer": "@stable"
+            },
+            "suggest": {
+                "ext-apc": "This, APCu or Wincache is required for persistent connections.",
+                "ext-apcu": "This, APC or Wincache is required for persistent connections.",
+                "ext-iconv": "Used for charset conversion",
+                "ext-openssl": "Enables encrypted connections.",
+                "ext-wincache": "This, APC or APCu is required for persistent connections. Reccomended for Windows.",
+                "pear2/cache_shm": "Enables persistent connections.",
+                "pear2/console_color": "Enables colors in the console",
+                "pear2/console_commandline": "Enables the console"
+            },
+            "bin": [
+                "scripts/roscon.php"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PEAR2\\Cache\\SHM": "vendor/pear2/cache_shm/src/",
+                    "PEAR2\\Console\\Color": "vendor/pear2/console_color/src/",
+                    "PEAR2\\Net\\RouterOS\\": "src/",
+                    "PEAR2\\Net\\Transmitter\\": "vendor/pear2/net_transmitter/src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-only"
+            ],
+            "authors": [
+                {
+                    "name": "Vasil Rangelov",
+                    "email": "boen.robot@gmail.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "This package allows you to read and write information from a RouterOS host using MikroTik's RouterOS API.",
+            "homepage": "http://pear2.github.com/Net_RouterOS/",
+            "keywords": [
+                "api",
+                "mikrotik",
+                "package",
+                "pear2",
+                "router",
+                "routeros"
+            ],
+            "support": {
+                "issues": "https://github.com/pear2/Net_RouterOS/issues",
+                "source": "https://github.com/pear2/Net_RouterOS/tree/develop",
+                "wiki": "https://github.com/pear2/Net_RouterOS/wiki"
+            },
+            "time": "2022-04-21T19:23:45+00:00"
+        },
+        {
+            "name": "pear2/net_transmitter",
+            "version": "1.0.0b1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear2/Net_Transmitter.git",
+                "reference": "461564b18b7245f05dea80d943d2b87eb6a5de5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear2/Net_Transmitter/zipball/461564b18b7245f05dea80d943d2b87eb6a5de5e",
+                "reference": "461564b18b7245f05dea80d943d2b87eb6a5de5e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "@stable"
+            },
+            "suggest": {
+                "ext-apc": "This, APCu or Wincache is required for persistent connections.",
+                "ext-apcu": "This, APC or Wincache is required for persistent connections.",
+                "ext-openssl": "Enables encrypted connections.",
+                "ext-wincache": "This, APC or APCu is required for persistent connections. Reccomended for Windows.",
+                "pear2/cache_shm": "Enables persistent connections"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PEAR2\\Net\\Transmitter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Vasil Rangelov",
+                    "email": "boen.robot@gmail.com",
+                    "role": "lead"
+                }
+            ],
+            "description": "A stream wrapper that ensures data integrity. Particularly useful for sockets.",
+            "homepage": "http://pear2.github.com/Net_Transmitter/",
+            "keywords": [
+                "Socket",
+                "integrity",
+                "network",
+                "networking",
+                "package",
+                "pear2",
+                "sockets"
+            ],
+            "support": {
+                "issues": "http://github.com/pear2/Net_Transmitter/issues",
+                "source": "https://github.com/pear2/Net_Transmitter/tree/develop",
+                "wiki": "http://github.com/pear2/Net_Transmitter/wiki"
+            },
+            "time": "2016-11-07T02:15:19+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -8322,7 +8520,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "pear2/net_routeros": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -3,7 +3,7 @@
 @section('title' , 'Dispositivos')
 
 @push('styles')
-<link rel="stylesheet" href=" {{ mix('css/style.css')}} " />
+
 @endpush
 
 
@@ -36,43 +36,25 @@
         <a href="/device/create" class="icon fa-plus special pull-right"></a>
     </div>&nbsp
     <div class="card-columns">
-        @foreach ($devices as $device)
+        @foreach ($detailed as $device)
         <div class="col">
             <div class="card bg-custom h-100">
                 <div class="card-body">
                     <a href="/device/{{ $device->id }}">
                         <h3 class="h3"><i class="bi-router"></i> {{ $device->name }}</h3>
+                    <small class="text-muted float-right">CPU: {{ $device->cpu_load }}%</small>
                     </a>
-                    <p class="card-text text-justify">Endereço IP: {{ $device->ip }}</p>
-                    <p>
-                        <br />Tempo ligado: sistema desconectado
-                        <br />Clientes cadastrados: --
-                        <br />Clientes conectados: --
+                    <p class="card-text text-justify">IP: {{ $device->ip }}
+                        <br />Tempo ligado: {{ $device->uptime }}
+                        <br />Dispositivo: {{ $device->board_name }}
+                        <br />Version: {{ $device->version }}
                     </p>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted float-end">
-
-                        <button class="btn btn-primary btn-xs" type="button" onclick="location.reload()">
-                            <i class="icon fa-sync"></i>
-                        </button>
-
-                        <a class="clean" href="/device/{{ $device->id }}/getCert" onclick="alert('Baixando seu certificado')">
-                            <button class="btn btn-success btn-xs" type="button">
-                                <i class="icon fa-download"></i>
-                            </button>
-                        </a>
-
-                        <a class="clean" href="/device/{{ $device->id }}/edit">
-                            <button class="btn btn-warning btn-xs" type="button">
-                                <i class="icon fa-edit"></i>
-                            </button>
-                        </a>
-                        <a class="clean" href="/device/{{ $device->id }}/delete">
-                            <button class="btn btn-danger btn-xs" type="button" onclick="return confirm('Deseja remover esse dispositivo?')">
-                                <i class="icon fa-trash"></i>
-                            </button>
-                        </a>
+                <div class="card-footer float-right">
+                    <small class="text-muted">
+                        <a class="clean icon fa-sync" href="/device/{{ $device->id }}/sync"></a>
+                        <a  href="/device/{{ $device->id }}/edit" class="clean icon fa-edit"></a>
+                        <a href="/device/{{ $device->id }}/delete" onclick="return confirm('Deseja remover esse dispositivo?')" class="clean icon fa-trash"></a>
                     </small>
                 </div>
             </div>

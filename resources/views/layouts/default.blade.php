@@ -45,6 +45,7 @@
                             @if (Auth::user()->teams->first()->id == '1')
                             <li><a href="/users ">Usuários</a></li>
                             <li><a href="/devices">Dispositívos</a></li>
+                            <li><a href="/system">Sistema</a></li>
                             @endif
                             <li><a href="/logout">Sair</a></li>
                         </ul>

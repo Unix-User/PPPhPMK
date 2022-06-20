@@ -17,6 +17,8 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
+            $table->string('password')->nullable();
+            $table->string('mode')->nullable();
             $table->timestamps();
         });
 
@@ -32,7 +34,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        App\Models\Team::create(['name' => 'Administrador']);
+        App\Models\Team::create(['name' => 'Administrador', 'password' => '1234', 'mode' => 'dev']);
         App\Models\User::find(1)->teams()->attach(1);
         App\Models\User::find(1)->contracts()->create(['user_id' => 1, 'product_id' => 1, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
         

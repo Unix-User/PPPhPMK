@@ -34,11 +34,16 @@ Route::controller(UserController::class)->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('users', 'index');
         Route::get('user/{id}/show', 'show');
-        // route for payment
         Route::get('user/{id}/payment', 'payment');
         Route::get('user/{id}/edit', 'edit');
         Route::post('user/{id}/update', 'update');
         Route::get('user/{id}/delete', 'delete');
+        Route::any('user/{id}/disconnect', 'disconnect');
+        Route::get('user/{id}/enable', 'enable');
+        Route::get('user/{id}/disable', 'disable');
+        Route::get('user/{id}/remove', 'remove');
+        Route::get('system', 'system');
+        Route::post('system/{id}/config', 'config');
     });
     Route::get('login', 'login')->name('login');
     Route::get('user/recovery', 'recovery');
@@ -48,14 +53,11 @@ Route::controller(UserController::class)->group(function () {
     Route::post('login/auth', 'authenticate');
     Route::get('logout', 'logout')->name('logout');
 });
-// if user is logged in, show the following routes
 
 Route::controller(ProductController::class)->group(function () {
     Route::get('products', 'index');
     Route::get('product/{id}/show', 'show');
-    // route for the user to buy a product
     Route::middleware('auth')->group(function () {
-        
         Route::get('product/create', 'create');
         Route::post('product/store', 'store');
         Route::get('product/{id}/edit', 'edit');
@@ -72,6 +74,7 @@ Route::controller(DeviceController::class)->group(function () {
     Route::post('device/store', 'store');
     Route::get('device/{id}', 'show');
     Route::get('device/{id}/edit', 'edit');
+    Route::get('device/{id}/sync', 'sync');
     Route::post('device/{id}/update', 'update');
     Route::get('device/{id}/delete', 'delete');
     });
