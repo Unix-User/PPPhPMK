@@ -11,7 +11,6 @@
     <h2>Confirme seu pagamento <span class="text-capitalize">{{ $user->name }}</span>!</h2>
     <p>Agora basta efetuar o pagamento de sua fatura para liberar a sua internet</p>
 </header>
-<!-- Content -->
 <div class="card-deck">
     <div class="card col-sm-4 bg-custom">
         <a class="clean" href="/product/{{  $user->contracts->last()->product->id; }}/show">
@@ -21,7 +20,8 @@
             </div>
             <img class="card-img-top" src="/images/{{ $user->contracts->last()->product->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text">{{ $user->contracts->last()->product->description; }}</p>
+                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description; }}</p>
+                <small class="float-left text-muted">Resp. técnico: {{ $user->contracts->last()->product->user->name }}</small>
             </div>
             <div class="card-footer">
                 <ul class="actions">
@@ -32,7 +32,7 @@
     </div>
     <div class="card col-sm-8 bg-custom">
         <div class="card-header">
-            <span class="icon alt fa-money"></span>
+            <span class="icon alt fa-money-bill-alt"></span>
             <span class="text-capitalize"><strong>Pagamento on-line - Boleto, Cartões, PIX</strong></span>
             </span>
         </div>
@@ -68,7 +68,7 @@
                 </li>
                 <li class="float-right align-bottom">
                     <h1 class="h1 text-right">R${{ $user->contracts->last()->product->price }}</h1>
-                    <small class="float-right text-muted">Resp. técnico: {{ $user->contracts->last()->product->user->name }}</small>
+                    
                 </li>
             </ul>
         </div>

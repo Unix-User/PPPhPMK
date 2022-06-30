@@ -17,10 +17,27 @@
 <span id="form"></span>
 <!-- Form -->
 <section>
+    @if(session()->has('success'))
+    <div class="alert alert-success" style="width: 100%; position: relative; background-color: #272833; border-color: #155724" role="alert">
+        {{ session()->get('success') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
+    @if(session()->has('error'))
+    <div class="alert alert-danger" style="width: 100%; position: relative; background-color: #272833; border-color: #843534" role="alert">
+        {{ session()->get('error') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
     <div style="margin: 60px">
         <h3>Mensagem</h3>
         <form method="post" action="send">
             @csrf
+            @method('POST')
             <div class="row uniform 80%">
                 <div class="6u 12u$(xsmall)">
                     <input type="text" name="name" id="name" value="<?php echo isset($_POST['name']) ? $_POST['name'] : ''; ?>" placeholder="Nome" />

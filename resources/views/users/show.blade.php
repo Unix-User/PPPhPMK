@@ -38,10 +38,8 @@
             </div>
             <img class="card-img-top" src="/images/{{ $user->contracts->last()->product->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description; }}
-                    <br />Técnico: <a href="/user/{{ $user->contracts->last()->product->user->id }}/show">{{ $user->contracts->last()->user->name }}</a>
-                </p>
-                <p class="card-text"><small class="text-muted"> R${{ $user->contracts->last()->product->price; }}</small></p>
+                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description; }}</p>
+                <small class="float-left text-muted">Resp. técnico: {{ $user->contracts->last()->product->user->name }}</small>
             </div>
             <div class="card-footer">
                 <ul class="actions">
@@ -77,23 +75,18 @@
             <strong class="text-capitalize">{{ $user->name }}</strong>
         </div>
         <div class="card-body">
-
             <p class="card-text">
-
-            <form action="/processar_pagamento" method="POST">
-                <ul>
-                    <li><strong>Email: </strong>{{ $user->email }}</li>
-                    <li><strong>Telefone: </strong>{{ $user->phone }}</li>
-                    <li><strong>CEP: </strong>{{ $user->cep }}</li>
-                    <li><strong>Rua: </strong>{{ $user->rua }}</li>
-                    <li><strong>Bairro: </strong>{{ $user->bairro }}</li>
-                    <li><strong>Cidade: </strong>{{ $user->cidade }}</li>
-                    <li><strong>Estado: </strong>{{ $user->uf }}</li>
-                    <li><strong>Nº: </strong>{{ $user->num }}</li>
-                    <li><strong>Complemento: </strong>{{ $user->complemento }}</li>
-                    <li><strong>team: </strong>{{ $user->teams()->first()->id }}-{{ $user->teams()->first()->name }}</li>
-                </ul>
-            </form>
+            <strong>Email: </strong>{{ $user->email }}
+            <strong>Telefone: </strong>{{ $user->phone }}
+            <strong>CEP: </strong>{{ $user->cep }}
+            <strong>Rua: </strong>{{ $user->rua }}</li>
+                <li><strong>Bairro: </strong>{{ $user->bairro }}</li>
+                <li><strong>Cidade: </strong>{{ $user->cidade }}</li>
+                <li><strong>Estado: </strong>{{ $user->uf }}</li>
+                <li><strong>Nº: </strong>{{ $user->num }}</li>
+                <li><strong>Complemento: </strong>{{ $user->complemento }}</li>
+                <li><strong>team: </strong>{{ $user->teams()->first()->id }}-{{ $user->teams()->first()->name }}</li>
+            </ul>
             </p>
         </div>
         <div class="card-footer">
@@ -134,7 +127,8 @@
             </tbody>
         </table>
     </div>
-</div><!-- future fearures
+</div>
+<!-- future fearures
 <hr />
 <div class="card-deck">
 <div class="card col-sm-8 bg-custom">

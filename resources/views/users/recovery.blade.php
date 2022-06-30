@@ -32,8 +32,8 @@
                         </div>
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Enviar link de recuperação de senha') }}
+                                <button type="submit" class="button special">
+                                    {{ __('Enviar link de recuperação') }}
                                 </button>
                             </div>
                         </div>
@@ -43,4 +43,4 @@
         </div>
     </div>
 </div>
-@endsection    
+@endsection

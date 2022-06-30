@@ -63,7 +63,7 @@
                                 </a>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block mb-4">{{ __('Login') }}</button>
+                        <button type="submit" class="button special btn-block mb-4">{{ __('Login') }}</button>
                         <div class="text-center">
                             <p>Não é membro? <a class="clean" href="/user/create">{{ __('Registre-se') }}</a></p>
                         </div>
