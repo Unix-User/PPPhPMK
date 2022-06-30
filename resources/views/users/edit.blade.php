@@ -58,7 +58,11 @@
                             <option value="">Nenhum plano cadastrado</option>
                             @else
                             @foreach($products as $product)
-                            <option value="{{ $product->id }}" @if(isset($user->contracts->first()->product_id) == $product->id) selected @endif>{{ $product->name }}</option>
+                            @if(isset($user->contracts->last()->product_id) && ($user->contracts->last()->product_id == $product->id))
+                            <option value="{{ $user->contracts->last()->product_id }}" selected>{{ $user->contracts->last()->product->name }}</option>
+                            @else
+                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                            @endif
                             @endforeach
                             @endif
                         </select>

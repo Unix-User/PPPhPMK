@@ -107,31 +107,22 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        switch (auth()->user()->id) {
-            case auth()->user()->id == '1':
-                return view('users.show', compact('user'));
-            case auth()->user()->id == $user->teams->first()->id:
-                return view('users.show', compact('user'));
-            case auth()->user()->id == $user->id:
-                return view('users.show', compact('user'));
-            default:
-                return redirect('/users');
+        if ((auth()->user()->id == '1') || (auth()->user()->id == $user->teams->first()->id) || (auth()->user()->id == $user->id)) {
+            return view('users.show', compact('user'));
         }
+        return redirect()->back()->with('error', 'You are not authorized');
     }
 
     public function edit($id)
     {
         $user = User::find($id);
-        /* 
-         * admin team is id 1
-         * test if user is admin or user is editing his own profile
-         */
         switch (auth()->user()->id) {
             case auth()->user()->id == $user->id:
+                if (auth()->user()->id == '1') {
+                    $products = Product::all();
+                    return view('users.edit', compact('user', 'products'));
+                }
                 $products = Product::where('user_id', auth()->user()->teams->first()->id)->get();
-                return view('users.edit', compact('user', 'products'));
-            case auth()->user()->id == '1':
-                $products = Product::all();
                 return view('users.edit', compact('user', 'products'));
             case auth()->user()->id == $user->teams->first()->id:
                 $products = Product::where('user_id', auth()->user()->id)->get();
@@ -147,7 +138,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'phone' => 'required|string|max:255|unique:users,phone,' . $id,
+            'phone' => 'required|string|max:255|unique:users,phone:BR,' . $id,
             'cep' => 'string|max:255',
             'rua' => 'string|max:255',
             'num' => 'string|max:255',
@@ -188,7 +179,9 @@ class UserController extends Controller
         }
         $user->save();
         $user->teams()->sync($team, ['updated_at' => now()]);
-        $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
+        if ($user->contracts->last()->product_id != $product->id) {
+            $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
+        }
         return redirect('/users')->with('success', 'User updated successfully');
     }
 
@@ -328,7 +321,7 @@ class UserController extends Controller
         if (User::find(1)->teams->first()->mode == 'dev') {
             $token = env('Test_MP_ACCESS_TOKEN');
         }
-        $log = 'nova requisição:'.$input["data"]["id"];
+        $log = 'nova requisição:' . $input["data"]["id"];
         SDK::setAccessToken($token);
         switch ($input["type"]) {
             case "payment":
@@ -464,5 +457,4 @@ class UserController extends Controller
         }
         return redirect()->back()->with('success', 'Removido com sucesso');
     }
-
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\PortfolioController;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,22 @@ use App\Http\Controllers\PortfolioController;
 // 
 Route::get('/', function () {
     return view('landing');
+});
+
+Route::get('/mailable1', function () {
+    $test = [
+        'name' => 'required',
+        'email' => 'required|email',
+        'category' => 'required',
+        'message' => 'required'
+    ];
+    return new App\Mail\Contact($test);
+});
+
+Route::get('/mailable2', function () {
+    $user = User::where('email', 'wevertonsilveiralima@hotmail.com')->first();
+    $token = $user->remember_token;
+    return new App\Mail\PasswordReset($user, $token);
 });
 
 // get status on url and render view notification passing the status

@@ -6,42 +6,47 @@
 @endpush
 
 @section('content')
-
-@if(session()->has('success'))
-<div class="alert alert-success" style="width: 100%; position: relative; background-color: #272833; border-color: #155724" role="alert">
-    {{ session()->get('success') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-@endif
-@if(session()->has('error'))
-<div class="alert alert-danger" style="width: 100%; position: relative; background-color: #272833; border-color: #843534" role="alert">
-    {{ session()->get('error') }}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-@endif
 <header class="major">
     <h2>{{ $product->name }}</h2>
+    <p>Confira os detalhes do plano {{ $product->name }}</p>
 </header>
-<!-- card with image placed left -->
-<div class="card bg-custom">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <img class="card-img-top" src="/images/{{ $product->image }}" alt="Card image cap">
+<div class="card-deck">
+    <div class="card col-sm-4 bg-custom">
+        <a class="clean" href="/product/{{  $product->id; }}/show">
+            <div class="card-header">
+                <span class="icon alt fa-wifi"></span>
+                <strong class="text-capitalize"> {{ $product->name }}</strong>
             </div>
-            <div class="col-md-8">
+            <img class="card-img-top" src="/images/{{ $product->image }}" alt="Card image">
+            <div class="card-footer">
+                <ul class="actions">
+                    <li>
+                        <a href="/product/{{ $product->id }}/select" class="button">Selecionar</a>
+                    </li>
+                </ul>
+            </div>
+        </a>
+    </div>
+    <div class="card col-sm-8 bg-custom">
+        <div class="card-header">
+            <span class="icon alt fa-info-circle"></span>
+            <span class="text-capitalize"><strong> Detalhes do produto</strong></span>
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
                 <p class="card-text">{{ $product->description }}</p>
-                <p class="card-text"><small class="text-muted">Técnico: <a href="/user/{{ $product->user->id }}/show">{{ $product->user->name }}</a></small></p>
-                <p class="card-text"><small class="text-muted">R${{ $product->price }}</small></p>
-                <!-- if user is logged in display buy button -->
-                @if (Auth::check())
-                <a href="/product/{{ $product->id }}/select" class="btn btn-primary">Comprar</a>
-                @endif
+
+                </p>
             </div>
+        </div>
+        <div class="card-footer">
+            <ul class="actions">
+                <li class="float-right align-bottom">
+                    <h1 class="h1 text-right">R${{ $product->price }}</h1>
+                    <small class="float-right text-muted">Resp. técnico: {{ $product->user->name }}</small>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
