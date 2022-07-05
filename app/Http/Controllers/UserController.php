@@ -329,7 +329,6 @@ class UserController extends Controller
                 if ($payment->status == "approved") {
                     $contract = Contract::where('reference', $payment->external_reference);
                     $contract->update(['updated_at' => $payment->date_approved]);
-                    $log = "\n" . $contract->updated_at . " - contrato " . $payment->external_reference . " - status do pagamento:" . $payment->status;
                 }
                 break;
             case "plan":
