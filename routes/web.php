@@ -22,7 +22,7 @@ use App\Models\User;
 Route::get('/', function () {
     return view('landing');
 });
-
+/*
 Route::get('/mailable1', function () {
     $test = [
         'name' => 'required',
@@ -38,7 +38,7 @@ Route::get('/mailable2', function () {
     $token = $user->remember_token;
     return new App\Mail\PasswordReset($user, $token);
 });
-
+*/
 // get status on url and render view notification passing the status
 Route::get('/notification/{status}', function ($status) {
     return view('notification', ['status' => $status]);
