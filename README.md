@@ -2,9 +2,7 @@
 
 ## About
 
-
-O intuito desse projeto é refazer o site(<a href="dev.unixlocal.tk">unixlocal.tk</a>) implementando as
-
+O intuito desse projeto é refazer o site(<a href="https://dev.unixlocal.tk" target="_blank">unixlocal.tk</a>) implementando as
 features desenvolvidas nos ultimos projetos(simpleppphpmk && simpleppphp-mk-api)
 e ultimos conceitos aprendidos.
 
