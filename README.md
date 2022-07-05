@@ -8,6 +8,7 @@ e ultimos conceitos aprendidos.
 
 O novo site contará com:
 
+- Deploy automático com o GitHub
 - Documentação para apresebtação e utilização;
 - CRUD básico baseado no modelo do site antigo;
 - Opção para utilizar com Sqlite;
