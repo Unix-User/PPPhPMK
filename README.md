@@ -1,8 +1,8 @@
-<p align="center"><a href="https://unixlocal.ml" target="_blank">unixlocal.ml</a></p>
+<p align="center"><a href="https://unixlocal.tk" target="_blank">unixlocal.tk</a></p>
 
 ## About
 
-O intuito desse projeto é refazer o site(unixlocal.ml) implementando as
+O intuito desse projeto é refazer o site(dev.unixlocal.tk) implementando as
 features desenvolvidas nos ultimos projetos(simpleppphpmk && simpleppphp-mk-api)
 e ultimos conceitos aprendidos.
 
