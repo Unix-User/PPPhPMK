@@ -6,7 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\User;
 use PEAR2\Net\RouterOS;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use stdClass;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class DeviceController extends Controller
 {
@@ -17,8 +25,6 @@ class DeviceController extends Controller
         // create a new object in detailed variable
         $detailed = new stdClass();
         foreach ($devices as $device) {
-            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
-            $response = $client->sendSync(new RouterOS\Request('/system resource print'));
             // create a new device object
             $newDevice = new stdClass();
             $newDevice->id = $device->id;
@@ -26,13 +32,33 @@ class DeviceController extends Controller
             $newDevice->ip = $device->ip;
             $newDevice->user = $device->user;
             $newDevice->password = $device->password;
-            $newDevice->uptime = $response->getProperty('uptime');
-            $newDevice->cpu_load = $response->getProperty('cpu-load');
-            $newDevice->version = $response->getProperty('version');
-            $newDevice->board_name = $response->getProperty('board-name');
+            try {
+                $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+                $response = $client->sendSync(new RouterOS\Request('/system resource print'));
+                $newDevice->uptime = $response->getProperty('uptime');
+                $newDevice->cpu_load = $response->getProperty('cpu-load');
+                $newDevice->version = $response->getProperty('version');
+                $newDevice->board_name = $response->getProperty('board-name');
+            } catch (Exception $e) {
+                $newDevice->uptime = 'off-line';
+                $newDevice->cpu_load = '--';
+                $newDevice->version = '--';
+                $newDevice->board_name = '--';
+            }
             $detailed->{$device->id} = $newDevice;
         }
         return view('devices.index', compact('detailed'));
+    }
+
+    public function connect($id)
+    {
+        $device = Device::find($id);
+        if ($device->user_id == auth()->user()->id) {
+            $device->ikev2 = Str::random(60);
+            $device->save();
+            return view('devices.connect', compact('device'));
+        }
+        return back()->with('error', 'Dispositivo indisponivel!');
     }
 
     public function create()
@@ -58,7 +84,6 @@ class DeviceController extends Controller
         $device->ip = $request->ip;
         $device->user = $request->user;
         $device->password = $request->password;
-        $device->ikev2 = $request->ikev2;
         $device->user_id = auth()->user()->id;
         $device->save();
         return redirect('/devices')->with('success', 'Dispositivo criado com sucesso!');
@@ -118,7 +143,6 @@ class DeviceController extends Controller
         $device->ip = $request->ip;
         $device->user = $request->user;
         $device->password = $request->password;
-        $device->ikev2 = $request->ikev2;
         $device->user_id = auth()->user()->id;
         $device->save();
 
@@ -175,4 +199,73 @@ class DeviceController extends Controller
         }
         return redirect()->back()->with('success', 'Sistema sincronizado com sucesso');
     }
+
+    public function register($token)
+    {
+        if ($token == null) {
+            return;
+        }
+        $device = Device::where('ikev2', $token)->first();
+        $device->ikev2 = Str::random(60);
+        $device->save();
+        $script = null;
+        $ports = array(8728, 8729);
+        foreach ($ports as $port) {
+            $connection = @fsockopen($device->ip, $port, $errno, $errstr, 1);
+            if (!is_resource($connection)) {
+                $config = "conn $device->name" . PHP_EOL . "  rightid=@$device->name" . PHP_EOL . "  rightaddresspool=" . $device->ip . "-" . $device->ip . PHP_EOL . "  also=ikev2-cp" . PHP_EOL;
+                Storage::disk('local')->put($device->name . '.conf', $config);
+                $process = new Process(['sudo', '-u', 'www-data', 'sudo', 'systemctl', 'restart', 'ipsec.service',]);
+                $process->run();
+                $script = "/tool fetch url=https://" . $_SERVER['HTTP_HOST'] . "/api/cert/" . $device->ikev2 . " dst-path=" . $device->name . '.p12; :delay 4000ms;' . PHP_EOL;
+                $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
+                $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
+                $script .= "/ip ipsec mode-config add name=ike2-rw responder=no;" . PHP_EOL;
+                $script .= "/ip ipsec policy group add name=ike2-rw;" . PHP_EOL;
+                $script .= "/ip ipsec profile add name=ike2-rw;" . PHP_EOL;
+                $script .= "/ip ipsec peer add address=srv." . $_SERVER['HTTP_HOST'] . " exchange-mode=ike2 name=ike2-rw-client profile=ike2-rw;" . PHP_EOL;
+                $script .= "/ip ipsec proposal add name=ike2-rw pfs-group=none;" . PHP_EOL;
+                $script .= "/ip ipsec identity add auth-method=digital-signature certificate=$device->name.p12_1 generate-policy=port-strict mode-config=ike2-rw peer=ike2-rw-client policy-template-group=ike2-rw;" . PHP_EOL;
+                $script .= "/ip ipsec policy add group=ike2-rw proposal=ike2-rw template=yes" . PHP_EOL;
+            } else {
+                fclose($connection);
+            }
+        }
+        return $script;
+    }
+
+    public function cert($token)
+    {
+        if ($token == null) {
+            return;
+        }
+        $device = Device::where('ikev2', $token)->first();
+        $device->ikev2 = null;
+        $device->save();
+
+        $process = new Process(['sudo', '-u', 'www-data', 'sudo', '/usr/bin/ikev2.sh', '--addclient', $device->name]);
+        $process->run();
+
+
+        if (!$process->isSuccessful()) {
+            $process = new Process(['sudo', '-u', 'www-data', 'sudo', '/usr/bin/ikev2.sh', '--exportclient', $device->name]);
+            $process->run();
+            $fileName = $device->name . '.p12';
+            //throw new ProcessFailedException($process);
+        }
+        $fileName = $device->name . '.p12';
+        
+        if (!$fileName || !Storage::disk('cert')->exists($fileName)) {
+            abort(404);
+        }
+        return response()->stream(function() use ($fileName) {
+            $stream = Storage::disk('cert')->readStream($fileName);
+            fpassthru($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }, 200, [
+            'Content-Disposition'   => 'attachment; filename="' . basename($fileName) . '"',
+        ]);
+        }
 }

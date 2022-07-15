@@ -92,6 +92,7 @@ Route::controller(DeviceController::class)->group(function () {
     Route::get('device/{id}', 'show');
     Route::get('device/{id}/edit', 'edit');
     Route::get('device/{id}/sync', 'sync');
+    Route::get('device/{id}/connect', 'connect');
     Route::post('device/{id}/update', 'update');
     Route::get('device/{id}/delete', 'delete');
     });
