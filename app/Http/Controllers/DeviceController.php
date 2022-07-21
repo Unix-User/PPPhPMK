@@ -69,7 +69,7 @@ class DeviceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|alpha_dash',
             'ip' => 'required',
             'user' => 'required',
             'password' => 'required',
@@ -129,7 +129,7 @@ class DeviceController extends Controller
     {
         $request->validate([
             'ip' => 'required',
-            'name' => 'required',
+            'name' => 'required|alpha_dash',
             'user' => 'required',
             'password' => 'required',
         ]);
@@ -159,6 +159,13 @@ class DeviceController extends Controller
 
     public function sync($id)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $device = Device::find($id);
         $client = new RouterOS\Client($device->ip, $device->user, $device->password);
         foreach (User::all() as $user) {
@@ -186,7 +193,7 @@ class DeviceController extends Controller
             if ($user->contracts->last()->product->tags != null) {
                 $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
             }
-            $request->setArgument('comment', 'Perfil criado pelo sistema' . auth()->user()->name);
+            $request->setArgument('comment', 'Perfil criado pelo sistema - ' . auth()->user()->name);
             $client->sendSync($request);
 
             $request = new RouterOS\Request('/ppp secret add');

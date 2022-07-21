@@ -7,6 +7,23 @@
 
 
 @section('content')
+
+@if(session()->has('success'))
+<div class="alert alert-success" style="width: 100%; position: relative; background-color: #272833; border-color: #155724" role="alert">
+    {{ session()->get('success') }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
+@if(session()->has('error'))
+<div class="alert alert-danger" style="width: 100%; position: relative; background-color: #272833; border-color: #843534" role="alert">
+    {{ session()->get('error') }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
 <header class="major">
     <h2>Usuários do sistema</h2>
     <p>Essa é a página de gerenciamento. Aqui voce pode visualizar, selecionar cadastrar ou deletar usuários</p>
@@ -16,7 +33,6 @@
     <table class="alt">
         <thead>
             <tr>
-                <th>id</th>
                 <th>usuário</th>
                 <th class="d-none d-lg-table-cell ">telefone</th>
                 <th class="d-none d-lg-table-cell ">email</th>
@@ -30,10 +46,15 @@
         </thead>
         <tbody>
             @foreach($users as $user)
-            @if(auth()->user()->id == '1' || $user->teams->first()->id == auth()->user()->id)
+
             <tr>
-                <th><a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->id; }}</a></th>
-                <th><a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->name; }}</a></th>
+                <th>
+                    @if(auth()->user()->id == '1' || $user->teams->first()->name == auth()->user()->name)
+                    <a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->id; }} - {{ $user->name; }}</a>
+                    @else
+                    {{ $user->id; }} - {{ $user->name; }}
+                    @endif
+                </th>
                 <th class="d-none d-lg-table-cell"><a target="_new" href="https://wa.me/55{{ $user->phone; }}" class="icon clean alt fa-whatsapp"><span class="label">Whatsapp</span></a> {{ $user->phone; }}</th>
                 <th class="d-none d-lg-table-cell"><a href="mailto:{{ $user->email; }}" class="icon alt fa-envelope"><span class="label">Email</span></a> {{ $user->email; }}</th>
                 <th class="d-none d-lg-table-cell">
@@ -58,11 +79,15 @@
                     @endif
                 </th>
                 <th class="text-right">
+                    @if(auth()->user()->id == '1' || $user->teams->first()->name == auth()->user()->name)
                     <a href="/user/{{ $user->id; }}/edit" class="icon solid fa-edit"></a>
                     <a href="/user/{{ $user->id; }}/delete" class="icon solid fa-trash"></a>
+                    @else
+                    <a href="#" class="icon solid fa-edit" onclick="alert('Não é possivel editar esse usuário')"></a>
+                    <a href="#" class="icon solid fa-trash" onclick="alert('Não é possivel remover esse usuário')"></a>
+                    @endif
                 </th>
             </tr>
-            @endif
             @endforeach
         </tbody>
     </table>
