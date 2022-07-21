@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" />
     <script src="https://kit.fontawesome.com/a668bbe4fe.js" crossorigin="anonymous"></script>
-    <!--- bootstrap --->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
@@ -23,17 +22,12 @@
 
 <body>
     <div id="page-wrapper">
-        <!-- Header -->
         <header id="header">
             <h1 id="logo"><a href="/">IT Services</a></h1>
             @section('menu')
             <nav id="nav">
                 <ul>
-                    <!-- if user is logged in, show dropdown with 3 links -->
                     @if (Auth::check())
-                    <li>
-                        <a href="#">{{ date('d/m/Y H:i:s') }}</a>
-                    </li>
                     <li><a href="/products">Produtos</a></li>
                     <li class="dropdown">
                         <a href="#" class="text-capitalize">{{ Auth::user()->name }}</a>
@@ -56,14 +50,12 @@
             </nav>
             @show
         </header>
-        <!-- Main -->
         <div id="main" class="wrapper style1">
             <div class="container">
                 @yield('content')
             </div>
         </div>
 
-        <!-- Footer -->
         <footer id="footer">
             <ul class="icons">
                 <li><a href="https://twitter.com/***REMOVED***" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
@@ -80,7 +72,6 @@
         </footer>
     </div>
 
-    <!-- Scripts -->
     <script>
         window.intergramId = "-1001605193657"
         window.intergramServer = "https://unixat.herokuapp.com"
@@ -91,8 +82,8 @@
             autoResponse: 'Procurando um atendente disponivel',
             autoNoResponse: 'Nenhum atendente disponivel no momento ' +
                 'Tente novamente em alguns minutos',
-            mainColor: "#e44c65", // Can be any css supported color 'red', 'rgb(255,87,34)', etc
-            alwaysUseFloatingButton: true // Use the mobile floating button also on large screens
+            mainColor: "#e44c65",
+            alwaysUseFloatingButton: true
         };
     </script>
     <script id="intergram" type="text/javascript" src="https://unixat.herokuapp.com/js/widget.js"></script>
