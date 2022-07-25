@@ -21,8 +21,8 @@ echo "Deploying application ..."
     # Clear cache
     php artisan optimize
 
-    # Reload PHP to update opcache
-    echo "" | sudo -S service php7.4-fpm reload
+    # Reload PHP to update opcach.e
+    echo "" | sudo -S service php8.1-fpm reload
 # Exit maintenance mode
 php artisan up
 
