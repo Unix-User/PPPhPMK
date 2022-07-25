@@ -54,6 +54,10 @@
                 @endforeach
             </tbody>
         </table>
+
+    </div>
+    <div class="d-flex justify-content-center">
+        {{ $newUsers->links() }}
     </div>
 </section>
 @endsection
