@@ -115,7 +115,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        if ((auth()->user()->id == '1') || (auth()->user()->id == $user->teams->first()->id) || (auth()->user()->id == $user->id)) {
+        if ((auth()->user()->id == '1') || (auth()->user()->name == $user->teams->first()->name) || (auth()->user()->id == $user->id)) {
             return view('users.show', compact('user'));
         }
         return redirect()->back()->with('error', 'You are not authorized');

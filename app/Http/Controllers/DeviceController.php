@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Device;
+use App\Support\Collection;
 use App\Models\User;
 use PEAR2\Net\RouterOS;
 use Illuminate\Support\Str;
@@ -22,30 +23,39 @@ class DeviceController extends Controller
     public function index()
     {
         $devices = Device::all();
-        // create a new object in detailed variable
         $detailed = new stdClass();
+        $items = [];
         foreach ($devices as $device) {
-            // create a new device object
-            $newDevice = new stdClass();
-            $newDevice->id = $device->id;
-            $newDevice->name = $device->name;
-            $newDevice->ip = $device->ip;
-            $newDevice->user = $device->user;
-            $newDevice->password = $device->password;
-            try {
-                $client = new RouterOS\Client($device->ip, $device->user, $device->password);
-                $response = $client->sendSync(new RouterOS\Request('/system resource print'));
-                $newDevice->uptime = $response->getProperty('uptime');
-                $newDevice->cpu_load = $response->getProperty('cpu-load');
-                $newDevice->version = $response->getProperty('version');
-                $newDevice->board_name = $response->getProperty('board-name');
-            } catch (Exception $e) {
-                $newDevice->uptime = 'off-line';
-                $newDevice->cpu_load = '--';
-                $newDevice->version = '--';
-                $newDevice->board_name = '--';
+            if (($device->user_id == auth()->user()->id) || (auth()->user()->id == 1)) {
+                try {
+                    $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+                    $response = $client->sendSync(new RouterOS\Request('/system resource print'));
+                    $items[$device->id] = [
+                        'id' => $device->id,
+                        'name' => $device->name,
+                        'ip' => $device->ip,
+                        'user' => $device->user,
+                        'password' => $device->password,
+                        'uptime' => $response->getProperty('uptime'),
+                        'cpu_load' => $response->getProperty('cpu-load'),
+                        'version' => $response->getProperty('version'),
+                        'board_name' => $response->getProperty('board-name')
+                    ];
+                } catch (Exception $e) {
+                    $items[$device->id] = [
+                        'id' => $device->id,
+                        'name' => $device->name,
+                        'ip' => $device->ip,
+                        'user' => $device->user,
+                        'password' => $device->password,
+                        'uptime' => 'off-line',
+                        'cpu_load' => '---',
+                        'version' => '---',
+                        'board_name' => '---'
+                    ];
+                }
+                $detailed =  (new Collection($items))->paginate(3);
             }
-            $detailed->{$device->id} = $newDevice;
         }
         return view('devices.index', compact('detailed'));
     }
@@ -96,7 +106,7 @@ class DeviceController extends Controller
         $users = User::all();
         $newUsers = new stdClass();
         foreach ($users as $user) {
-            if ($user->teams->first()->name == $device->user) {
+            if ($user->teams->first()->name == $device->user()->first()->name) {
                 $query = RouterOS\Query::where('name', $user->name);
                 $details = $user;
 
@@ -179,28 +189,34 @@ class DeviceController extends Controller
             $request->setArgument('numbers', $id);
             $client->sendSync($request);
 
-            $profilePrintRequest = new RouterOS\Request('/ppp profile print');
-            $profilePrintRequest->setArgument('.proplist', '.id');
-            $profilePrintRequest->setQuery(RouterOS\Query::where('name', $user->name));
-            $id = $client->sendSync($profilePrintRequest)->getProperty('.id');
+            $d1 = strtotime($user->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                $profile = 'notificar';
+            } else {
+                $profilePrintRequest = new RouterOS\Request('/ppp profile print');
+                $profilePrintRequest->setArgument('.proplist', '.id');
+                $profilePrintRequest->setQuery(RouterOS\Query::where('name', $user->name));
+                $id = $client->sendSync($profilePrintRequest)->getProperty('.id');
 
-            $request = new RouterOS\Request('/ppp profile remove');
-            $request->setArgument('numbers', $id);
-            $client->sendSync($request);
+                $request = new RouterOS\Request('/ppp profile remove');
+                $request->setArgument('numbers', $id);
+                $client->sendSync($request);
 
-            $request = new RouterOS\Request('/ppp profile add');
-            $request->setArgument('name', $user->name);
-            if ($user->contracts->last()->product->tags != null) {
-                $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
+                $request = new RouterOS\Request('/ppp profile add');
+                $request->setArgument('name', $user->name);
+                if ($user->contracts->last()->product->tags != null) {
+                    $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
+                }
+                $request->setArgument('comment', 'Perfil criado pelo sistema - ' . User::find($device->user_id)->teams()->first()->name);
+                $client->sendSync($request);
+                $profile = $user->name;
             }
-            $request->setArgument('comment', 'Perfil criado pelo sistema - ' . auth()->user()->name);
-            $client->sendSync($request);
-
             $request = new RouterOS\Request('/ppp secret add');
             $request->setArgument('name', $user->name);
             $request->setArgument('password', User::find($device->user_id)->teams()->first()->password);
             $request->setArgument('service', 'pppoe');
-            $request->setArgument('profile', $user->name);
+            $request->setArgument('profile', $profile);
             $request->setArgument('comment', 'Usuario criado pelo sistema - ' . auth()->user()->name);
             $client->sendSync($request);
         }
@@ -261,11 +277,11 @@ class DeviceController extends Controller
             //throw new ProcessFailedException($process);
         }
         $fileName = $device->name . '.p12';
-        
+
         if (!$fileName || !Storage::disk('cert')->exists($fileName)) {
             abort(404);
         }
-        return response()->stream(function() use ($fileName) {
+        return response()->stream(function () use ($fileName) {
             $stream = Storage::disk('cert')->readStream($fileName);
             fpassthru($stream);
             if (is_resource($stream)) {
@@ -274,5 +290,5 @@ class DeviceController extends Controller
         }, 200, [
             'Content-Disposition'   => 'attachment; filename="' . basename($fileName) . '"',
         ]);
-        }
+    }
 }
