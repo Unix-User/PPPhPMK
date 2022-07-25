@@ -38,8 +38,8 @@
             <div class="card-body">
                 <form action="/system/{{auth()->user()->id}}/config" method="POST">
                     @csrf
+                    <label>Configurações da API do mercado pago:</label>
                     <div class="form-group form-check-inline">
-                        Configurações da API do mercado pago:
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="mercado_pago" id="mercado_pago_produção" value="prod" onchange="this.form.submit()" {{ ($teams->where('name', auth()->user()->name)->first()->mode == 'prod') ? 'checked' : '' }}>
                             <label class="form-check-label" for="mercado_pago_produção">
@@ -64,18 +64,18 @@
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th>reference</th>
-                            <th>Data</th>
+                            <th class="d-none d-lg-table-cell ">reference</th>
+                            <th class="d-none d-lg-table-cell ">Data</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($contracts as $contract)
                         <tr>
-                            <td>{{ isset($contract->product) ? $contract->product->name : 'null' ; }}</td>
-                            <td>{{ $contract->reference }}</td>
-                            <td>{{ $contract->created_at }}</td>
-                            <td>{{ $contract->updated_at }}</td>
+                            <td class="text-truncate">{{ isset($contract->product) ? $contract->product->name : 'null' ; }}</td>
+                            <td class="d-none d-lg-table-cell ">{{ $contract->reference }}</td>
+                            <td class="d-none d-lg-table-cell ">{{ $contract->created_at }}</td>
+                            <td class="text-nowrap">{{ $contract->updated_at }}</td>
                         </tr>
                         @endforeach
                     </tbody>

@@ -24,7 +24,7 @@ use MercadoPago\MerchantOrder;
 use MercadoPago\Payer;
 use Ramsey\Uuid\Uuid;
 use PEAR2\Net\RouterOS;
-
+use stdClass;
 
 class UserController extends Controller
 {
@@ -32,6 +32,7 @@ class UserController extends Controller
     public function index()
     {
         if (auth()->user()->teams->first()->id == '1') {
+            $team = Team::where('name', auth()->user()->name)->first();
             $users = User::paginate(10);
             return view('users.index', compact('users'));
         }
@@ -53,6 +54,13 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         if (!Auth::check() || (auth()->user()->teams->first()->id == ('1' || '2'))) {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -90,7 +98,7 @@ class UserController extends Controller
             if (!$product) {
                 return redirect('/product/create')->with('error', 'Cadastre um produto primeiro!');
             }
-            $team = Team::where('name', $product->user->name)->first();
+            $team = Team::where('id', $product->user->id)->first();
             if (!$team) {
                 $team = new Team;
                 $team->name = $product->user->name;
@@ -117,14 +125,13 @@ class UserController extends Controller
     {
         $user = User::find($id);
         switch (auth()->user()->id) {
+            case auth()->user()->id == '1':
+                $products = Product::all();
+                return view('users.edit', compact('user', 'products'));
             case auth()->user()->id == $user->id:
-                if (auth()->user()->id == '1') {
-                    $products = Product::all();
-                    return view('users.edit', compact('user', 'products'));
-                }
                 $products = Product::where('user_id', auth()->user()->teams->first()->id)->get();
                 return view('users.edit', compact('user', 'products'));
-            case auth()->user()->id == $user->teams->first()->id:
+            case auth()->user()->name == $user->teams->first()->name:
                 $products = Product::where('user_id', auth()->user()->id)->get();
                 return view('users.edit', compact('user', 'products'));
             default:
@@ -135,6 +142,13 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1) && (Auth::user()->id != $id)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30 < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
@@ -171,7 +185,7 @@ class UserController extends Controller
         if (!$product) {
             return redirect('/product/create')->with('error', 'Cadastre um produto primeiro!');
         }
-        $team = Team::where('name', $product->user->name)->first();
+        $team = Team::where('id', $product->user->id)->first();
         if (!$team) {
             $team = new Team;
             $team->name = $product->user->name;
@@ -187,8 +201,15 @@ class UserController extends Controller
 
     public function delete($id)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $user = User::find($id);
-        if (auth()->user()->id == $user->id || auth()->user()->id == '1' || (auth()->user()->teams->first()->id == '1' && $user->teams->first()->id == auth()->user()->id)) {
+        if (auth()->user()->id == $user->id || auth()->user()->id == '1' || (auth()->user()->teams->first()->id == '1' && $user->teams->first()->name == auth()->user()->name)) {
             $user->delete();
             return redirect('/users')->with('success', 'User deleted successfully');
         }
@@ -207,7 +228,16 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
         if (Auth::attempt($credentials)) {
-            return redirect('/user/' . Auth::user()->id . '/show');
+            if (Auth::user()->id == 1) {
+                return redirect('/user/' . Auth::user()->id . '/show');
+            }
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Seja bem vindo, sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            } else {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('success', "Seja bem vindo, sua fatura vence em " . $d2 + 30  . " dias");
+            }
         } else {
             return redirect('/login')->with('error', 'Invalid credentials');
         }
@@ -358,7 +388,19 @@ class UserController extends Controller
 
     public function system()
     {
-
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30 < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
+        $team = Team::where('name', auth()->user()->name)->first();
+        if (!$team) {
+            $team = new Team;
+            $team->name = auth()->user()->name;
+            $team->save();
+        }
         $log = file_get_contents(public_path() . '/log.txt');
         $users = User::all();
         $teams = Team::all();
@@ -391,6 +433,13 @@ class UserController extends Controller
 
     public function disconnect($name)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30 < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $devices = Device::all();
         foreach ($devices as $device) {
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -408,6 +457,13 @@ class UserController extends Controller
 
     public function disable($name)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $devices = Device::all();
         foreach ($devices as $device) {
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -425,6 +481,13 @@ class UserController extends Controller
 
     public function enable($name)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $devices = Device::all();
         foreach ($devices as $device) {
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -442,6 +505,13 @@ class UserController extends Controller
 
     public function remove($name)
     {
+        if ((Auth::check()) && (Auth::user()->id != 1)) {
+            $d1 = strtotime(Auth::user()->contracts->last()->updated_at);
+            $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+            if ($d2 + 30  < 1) {
+                return redirect('/user/' . Auth::user()->id . '/show')->with('error', "Sua fatura venceu, efetue o pagamento para desbloquear o sistema");
+            }
+        }
         $devices = Device::all();
         foreach ($devices as $device) {
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
