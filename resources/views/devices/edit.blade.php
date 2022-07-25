@@ -48,10 +48,6 @@
                             <span class="help-block">{{ $errors->first('password') }}</span>
                             @endif
                         </div>
-                        <div class="form-group">
-                            <input type="checkbox" name="ikev2" id="ikev2" value="1" {{ $device->ikev2 ? 'checked' : '' }}>
-                            <label for="ikev2">IKEv2</label>
-                        </div>
                         <a href="/devices" class="clean">
                             <button type="button" class="btn btn-danger">
                                 <i class="fa fa-times"></i> Cancelar

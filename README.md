@@ -2,12 +2,13 @@
 
 ## About
 
-O intuito desse projeto é refazer o site(dev.unixlocal.tk) implementando as
+O intuito desse projeto é refazer o site(<a href="https://dev.unixlocal.tk" target="_blank">unixlocal.tk</a>) implementando as
 features desenvolvidas nos ultimos projetos(simpleppphpmk && simpleppphp-mk-api)
 e ultimos conceitos aprendidos.
 
 O novo site contará com:
 
+- Deploy automático com o GitHub
 - Documentação para apresebtação e utilização;
 - CRUD básico baseado no modelo do site antigo;
 - Opção para utilizar com Sqlite;

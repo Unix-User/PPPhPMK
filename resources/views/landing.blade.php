@@ -154,7 +154,7 @@
                 </header>
                 <form method="post" action="#" class="cta">
                     <div class="row gtr-uniform gtr-50">
-                        <div class="8u 6u$(xsmall)"><input type="email" name="email" id="email" placeholder="Seu melhor endereço de e-mail" /></div>
+                        <div class="8u 12u$(xsmall)"><input type="email" name="email" id="email" placeholder="Seu melhor endereço de e-mail" /></div>
                         <div class="4u 12u$(xsmall)"><input type="submit" value="Cadastrar-se" class="fit primary" /></div>
                     </div>
                 </form>
