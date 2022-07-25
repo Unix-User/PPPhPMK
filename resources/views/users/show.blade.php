@@ -72,22 +72,55 @@
     <div class="card col-sm-8 bg-custom">
         <div class="card-header">
             <span class="icon alt fa-user"></span>
-            <strong class="text-capitalize">{{ $user->name }}</strong>
+            <strong class="text-capitalize">Dados do cliente</strong>
         </div>
         <div class="card-body">
-            <p class="card-text">
-            <strong>Email: </strong>{{ $user->email }}
-            <strong>Telefone: </strong>{{ $user->phone }}
-            <strong>CEP: </strong>{{ $user->cep }}
-            <strong>Rua: </strong>{{ $user->rua }}</li>
-                <li><strong>Bairro: </strong>{{ $user->bairro }}</li>
-                <li><strong>Cidade: </strong>{{ $user->cidade }}</li>
-                <li><strong>Estado: </strong>{{ $user->uf }}</li>
-                <li><strong>Nº: </strong>{{ $user->num }}</li>
-                <li><strong>Complemento: </strong>{{ $user->complemento }}</li>
-                <li><strong>team: </strong>{{ $user->teams()->first()->id }}-{{ $user->teams()->first()->name }}</li>
-            </ul>
-            </p>
+            <div class="form-group row">
+                <div class="col-md-3 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->name }}" readonly/>
+                    <label>Usuário: </label>
+                </div>
+                <div class="col-md-5 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->email }}" readonly/>
+                    <label>Email: </label>
+                </div>
+                <div class="col-md-4 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->phone }}" readonly/>
+                    <label>Telefone: </label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->cep }}" readonly/>
+                    <label>CEP: </label>
+                </div>
+                <div class="col-md-4 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->bairro }}" readonly/>
+                    <label>Bairro: </label>
+                </div>
+                <div class="col-md-3 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->cidade }}" readonly/>
+                    <label>Cidade: </label>
+                </div>
+                <div class="col-md-2 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->uf }}" readonly/>
+                    <label>Estado: </label>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-7 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->rua }}" readonly/>
+                    <label>Rua: </label>
+                </div>
+                <div class="col-md-2 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->num }}" readonly/>
+                    <label>Nº: </label>
+                </div>
+                <div class="col-md-3 col-md-offset-0">
+                    <input type="text" class="form-control" value="{{ $user->complemento }}" readonly/>
+                    <label>Complemento: </label>
+                </div>
+            </div>
         </div>
         <div class="card-footer">
             <ul class="actions">
@@ -110,18 +143,18 @@
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>reference</th>
-                    <th>Data</th>
+                    <th class="d-none d-lg-table-cell ">reference</th>
+                    <th class="d-none d-lg-table-cell ">Data</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($user->contracts as $contract)
                 <tr>
-                    <td>{{ isset($contract->product) ? $contract->product->name : 'null' ; }}</td>
-                    <td>{{ $contract->reference }}</td>
-                    <td>{{ $contract->created_at }}</td>
-                    <td>{{ $contract->updated_at }}</td>
+                    <td class="text-truncate">{{ isset($contract->product) ? $contract->product->name : 'null' ; }}</td>
+                    <td class="d-none d-lg-table-cell ">{{ $contract->reference }}</td>
+                    <td class="d-none d-lg-table-cell ">{{ $contract->created_at }}</td>
+                    <td class="text-nowrap">{{ $contract->updated_at }}</td>
                 </tr>
                 @endforeach
             </tbody>
