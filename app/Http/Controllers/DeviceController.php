@@ -104,9 +104,9 @@ class DeviceController extends Controller
         $device = Device::find($id);
         $client = new RouterOS\Client($device->ip, $device->user, $device->password);
         $users = User::all();
-        $newUsers = new stdClass();
+        $detailed = new stdClass();
         foreach ($users as $user) {
-            if ($user->contracts->last()->product->user->name == auth()->user()->name) {
+            if ((auth()->user()->id == 1) || ($user->contracts->last()->product->user->name == auth()->user()->name)) {
                 $query = RouterOS\Query::where('name', $user->name);
                 $details = $user;
 
@@ -123,7 +123,8 @@ class DeviceController extends Controller
                 $details->address = $status->getProperty('address');
                 $details->uptime = $status->getProperty('uptime');
 
-                $newUsers->{$user->id} = $details;
+                $detailed->{$user->id} = $details;
+                $newUsers =  (new Collection($detailed))->paginate(10);
             }
         }
         return view('devices.show', compact('device', 'newUsers'));

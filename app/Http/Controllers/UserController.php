@@ -12,6 +12,7 @@ use App\Models\Device;
 use App\Models\Team;
 use App\Models\Contract;
 use App\Mail\PasswordReset;
+use App\Support\Collection;
 use Illuminate\Support\Arr;
 use MercadoPago\SDK;
 use MercadoPago\Payment;
@@ -31,12 +32,19 @@ class UserController extends Controller
 
     public function index()
     {
-        if (auth()->user()->teams->first()->id == '1') {
-            $team = Team::where('name', auth()->user()->name)->first();
-            $users = User::paginate(10);
-            return view('users.index', compact('users'));
+        if (auth()->user()->teams->first()->id != 1){
+            return redirect('/products')->with('error', 'página indisponivel');
         }
-        return redirect('/products');
+        $query = User::all();
+        $detailed = new stdClass();
+        foreach ($query as $user) {
+            if ((auth()->user()->id == 1) || ($user->contracts->last()->product->user->name == auth()->user()->name)) {
+                $details = $user;
+                $detailed->{$user->id} = $details;
+                $users =  (new Collection($detailed))->paginate(10);
+            }
+        }
+        return view('users.index', compact('users'));
     }
 
     public function create()
@@ -63,7 +71,7 @@ class UserController extends Controller
         }
         if (!Auth::check() || (auth()->user()->teams->first()->id == ('1' || '2'))) {
             $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'required|alpha_dash|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
                 'phone' => 'required|string|max:255|unique:users',
@@ -150,7 +158,7 @@ class UserController extends Controller
             }
         }
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|alpha_dash|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'phone' => 'required|string|max:255|unique:users,phone:BR,' . $id,
             'cep' => 'string|max:255',
@@ -185,7 +193,10 @@ class UserController extends Controller
         if (!$product) {
             return redirect('/product/create')->with('error', 'Cadastre um produto primeiro!');
         }
-        $team = Team::where('id', $product->user->id)->first();
+        $team = Team::where('name', $product->user->name)->first();
+        if($product->id == 1){
+            $team = Team::find(1);
+        }
         if (!$team) {
             $team = new Team;
             $team->name = $product->user->name;
