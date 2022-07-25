@@ -106,7 +106,7 @@ class DeviceController extends Controller
         $users = User::all();
         $newUsers = new stdClass();
         foreach ($users as $user) {
-            if ($user->teams->first()->name == $device->user()->first()->name) {
+            if ($user->contracts->last()->product->user->name == auth()->user()->name) {
                 $query = RouterOS\Query::where('name', $user->name);
                 $details = $user;
 
