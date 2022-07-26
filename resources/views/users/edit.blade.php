@@ -8,11 +8,6 @@
 @endpush
 
 @section('content')
-<header class="major">
-    <h2>Editar usuário</h2>
-    <p>Aqui você pode editar os dados do usuário</p>
-</header>
-
 @if ($errors->any())
 <div style="width: 100%; position: relative; background-color: #272833; border-color: #843534" class="alert alert-danger alert-dismissable" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -23,6 +18,10 @@
     @endforeach
 </div>
 @endif
+<header class="major">
+    <h2>Editar usuário</h2>
+    <p>Aqui você pode editar os dados do usuário</p>
+</header>
 <section>
     <div class="panel-body">
         <form action="/user/{{ $user->id }}/update" method="POST">
