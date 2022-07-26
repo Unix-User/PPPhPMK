@@ -137,7 +137,7 @@ class UserController extends Controller
                 $products = Product::all();
                 return view('users.edit', compact('user', 'products'));
             case auth()->user()->id == $user->id:
-                $products = Product::where('user_id', auth()->user()->teams->first()->id)->get();
+                $products = auth()->user()->contracts->last()->product->get();
                 return view('users.edit', compact('user', 'products'));
             case auth()->user()->name == $user->teams->first()->name:
                 $products = Product::where('user_id', auth()->user()->id)->get();
@@ -207,7 +207,7 @@ class UserController extends Controller
         if ($user->contracts->last()->product_id != $product->id) {
             $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
         }
-        return redirect('/users')->with('success', 'User updated successfully');
+        return redirect('/user/' . Auth::user()->id . '/show')->with('success', 'User updated successfully');
     }
 
     public function delete($id)
@@ -305,14 +305,14 @@ class UserController extends Controller
     public function payment($id)
     {
         $user = User::find($id);
-        if ($user->contracts->last()->updated_at > now()->subMinutes(2)) {
-            return redirect()->back()->with('error', 'Seu contrato ainda está ativo volte daqui ' . now()->subMinutes(2)->diffForHumans());
+        if ($user->contracts->last()->updated_at > now()->subDays(3)) {
+            return redirect()->back()->with('error', 'Seu contrato ainda está ativo volte daqui ' . now()->subDays(3)->diffForHumans());
         }
-        $token = env('MP_ACCESS_TOKEN');
-        $key = env('MP_PUB_KEY');
+        $token = ($user->teams->first()->token) ? $user->teams->first()->token : env('MP_ACCESS_TOKEN');
+        $key = ($user->teams->first()->key) ? $user->teams->first()->key : env('MP_PUB_KEY');
         if ($user->teams->last()->mode == 'dev') {
-            $token = env('Test_MP_ACCESS_TOKEN');
-            $key = env('Test_MP_PUB_KEY');
+            $token = ($user->teams->first()->test_token) ? $user->teams->first()->test_token : env('Test_MP_ACCESS_TOKEN');
+            $key = ($user->teams->first()->test_key) ? $user->teams->first()->test_key : env('Test_MP_PUB_KEY');
         }
         SDK::setAccessToken($token);
         $preference = new Preference();
@@ -322,7 +322,7 @@ class UserController extends Controller
         $item->unit_price = $user->contracts->last()->product->price;
         $preference->items = array($item);
         $preference->external_reference = $user->contracts->last()->reference;
-        $preference->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks';
+        $preference->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks?cliente='. $user->teams->first()->name;
         $preference->back_urls = (object) [
             "success" => env('APP_URL') . "/user/" . $user->id . "/show",
             "failure" => env('APP_URL') . "/user/" . $user->id . "/show",
@@ -336,7 +336,7 @@ class UserController extends Controller
         $payment->description = $user->contracts->last()->product->name;
         $payment->payment_method_id = "pix";
         $payment->external_reference = $user->contracts->last()->reference;
-        $payment->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks';
+        $payment->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks?cliente='. $user->teams->first()->name;
         $payment->payer = array(
             "email" => $user->email,
             "first_name" => $user->name,
@@ -359,7 +359,7 @@ class UserController extends Controller
     {
         $input = $request->all();
         $token = env('MP_ACCESS_TOKEN');
-        if (User::find(1)->teams->first()->mode == 'dev') {
+        if (User::where('name', $input['cliente'])->teams->first()->mode == 'dev') {
             $token = env('Test_MP_ACCESS_TOKEN');
         }
         $log = 'nova requisição:' . $input["data"]["id"];
@@ -438,6 +438,10 @@ class UserController extends Controller
         }
         $team->password = $password;
         $team->mode = $request->mercado_pago;
+        $team->key = $request->key;
+        $team->test_key = $request->test_key;
+        $team->token = $request->token;
+        $team->test_token = $request->test_token;
         $team->save();
         return redirect()->back()->with('success', 'Configurações atualizadas com sucesso - ' . $team->mode . '-' . $request->mercado_pago);
     }
