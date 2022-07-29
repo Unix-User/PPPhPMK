@@ -24,4 +24,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           port: ${{ secrets.PORT }}
           key: ${{ secrets.DEPLOY_SERVER }}
-          script: "cd /var/www/html && ./.scripts/deploy.sh"
+          script: "cd /var/www/unixlocal.tk && ./.scripts/deploy.sh"
