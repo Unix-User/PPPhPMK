@@ -17,7 +17,7 @@
         <div class="col-md-12">
             <div class="card bg-custom">
                 <div class="card-body">
-                    <form action="/device/{{ $device->id }}/update/" method="POST">
+                    <form action="/device/{{ $device->id }}/update" method="POST">
                         @csrf
                         @method('POST')
                         <div class="form-group">
