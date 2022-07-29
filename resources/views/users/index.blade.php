@@ -49,44 +49,56 @@
 
             <tr>
                 <th>
-                    @if(auth()->user()->id == '1' || $user->teams->first()->name == auth()->user()->name)
-                    <a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->id; }} - {{ $user->name; }}</a>
-                    @else
-                    {{ $user->id; }} - {{ $user->name; }}
-                    @endif
+                    @php
+                    $d1 = strtotime($user->contracts->last()->updated_at);
+                    $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+                    @endphp
+                    @if ($d2 + 30 < 1) <a class="clean text-warning" href="/user/{{ $user->id; }}/show">{{ $user->id; }} - {{ $user->name; }}</a>
+                        @else
+                        <a class="clean" href="/user/{{ $user->id; }}/show">{{ $user->id; }} - {{ $user->name; }}</a>
+                        @endif
                 </th>
                 <th class="d-none d-lg-table-cell"><a target="_new" href="https://wa.me/55{{ $user->phone; }}" class="icon clean alt fa-whatsapp"><span class="label">Whatsapp</span></a> {{ $user->phone; }}</th>
                 <th class="d-none d-lg-table-cell"><a href="mailto:{{ $user->email; }}" class="icon alt fa-envelope"><span class="label">Email</span></a> {{ $user->email; }}</th>
-                <th class="d-none d-lg-table-cell">
-                    @if($user->contracts->last())
-                    {{ $user->contracts->last()->product->id; }} -
-                    {{ $user->contracts->last()->product->name; }}
-                    @endif
-                </th>
-                <th class="d-none d-lg-table-cell">
-                    @if($user->teams->first())
-                    {{ $user->teams->first()->id; }} -
-                    {{ $user->teams->first()->name; }}
-                    @endif
-                </th>
-                <th class="d-none d-lg-table-cell">
-                    @if($user->contracts->last())
-                    @php
-                    $date = new DateTime($user->contracts->last()->created_at);
-                    $date->add(new DateInterval('P1M'));
-                    echo $date->format('d/m/Y H:i:s');
-                    @endphp
-                    @endif
-                </th>
-                <th class="text-right">
-                    @if(auth()->user()->id == '1' || $user->teams->first()->name == auth()->user()->name)
-                    <a href="/user/{{ $user->id; }}/edit" class="icon solid fa-edit"></a>
-                    <a href="/user/{{ $user->id; }}/delete" class="icon solid fa-trash"></a>
+                @php
+                $d1 = strtotime($user->contracts->last()->updated_at);
+                $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+                @endphp
+
+                @if ($d2 + 30 < 1) <th class="text-warning d-none d-lg-table-cell">
                     @else
-                    <a href="#" class="icon solid fa-edit" onclick="alert('Não é possivel editar esse usuário')"></a>
-                    <a href="#" class="icon solid fa-trash" onclick="alert('Não é possivel remover esse usuário')"></a>
-                    @endif
-                </th>
+                    <th class="d-none d-lg-table-cell">
+                        @endif
+                        @if($user->contracts->last())
+                        {{ $user->contracts->last()->product->id; }} -
+                        {{ $user->contracts->last()->product->name; }}
+                        @endif
+                    </th>
+
+                    <th class="d-none d-lg-table-cell">
+                        @if($user->teams->first())
+                        {{ $user->teams->first()->id; }} -
+                        {{ $user->teams->first()->name; }}
+                        @endif
+                    </th>
+                    <th class="d-none d-lg-table-cell">
+                        @if($user->contracts->last())
+                        @php
+                        $date = new DateTime($user->contracts->last()->created_at);
+                        $date->add(new DateInterval('P1M'));
+                        echo $date->format('d/m/Y H:i:s');
+                        @endphp
+                        @endif
+                    </th>
+                    <th class="text-right">
+                        @if(auth()->user()->id == '1' || $user->teams->first()->name == auth()->user()->name)
+                        <a href="/user/{{ $user->id; }}/edit" class="icon solid fa-edit"></a>
+                        <a href="/user/{{ $user->id; }}/delete" class="icon solid fa-trash"></a>
+                        @else
+                        <a href="#" class="icon solid fa-edit" onclick="alert('Não é possivel editar esse usuário')"></a>
+                        <a href="#" class="icon solid fa-trash" onclick="alert('Não é possivel remover esse usuário')"></a>
+                        @endif
+                    </th>
             </tr>
             @endforeach
         </tbody>
