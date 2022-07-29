@@ -77,48 +77,48 @@
         <div class="card-body">
             <div class="form-group row">
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->name }}" readonly/>
-                    <label>Usuário: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->name }}" readonly/>
+                    <label class="text-muted">Usuário: </label>
                 </div>
                 <div class="col-md-5 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->email }}" readonly/>
-                    <label>Email: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->email }}" readonly/>
+                    <label class="text-muted">Email: </label>
                 </div>
                 <div class="col-md-4 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->phone }}" readonly/>
-                    <label>Telefone: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->phone }}" readonly/>
+                    <label class="text-muted">Telefone: </label>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->cep }}" readonly/>
-                    <label>CEP: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->cep }}" readonly/>
+                    <label class="text-muted">CEP: </label>
                 </div>
                 <div class="col-md-4 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->bairro }}" readonly/>
-                    <label>Bairro: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->bairro }}" readonly/>
+                    <label class="text-muted">Bairro: </label>
                 </div>
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->cidade }}" readonly/>
-                    <label>Cidade: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->cidade }}" readonly/>
+                    <label class="text-muted">Cidade: </label>
                 </div>
                 <div class="col-md-2 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->uf }}" readonly/>
-                    <label>Estado: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->uf }}" readonly/>
+                    <label class="text-muted">Estado: </label>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-md-7 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->rua }}" readonly/>
-                    <label>Rua: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->rua }}" readonly/>
+                    <label class="text-muted">Rua: </label>
                 </div>
                 <div class="col-md-2 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->num }}" readonly/>
-                    <label>Nº: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->num }}" readonly/>
+                    <label class="text-muted">Nº: </label>
                 </div>
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control" value="{{ $user->complemento }}" readonly/>
-                    <label>Complemento: </label>
+                    <input type="text" class="form-control-sm" value="{{ $user->complemento }}" readonly/>
+                    <label class="text-muted">Complemento: </label>
                 </div>
             </div>
         </div>

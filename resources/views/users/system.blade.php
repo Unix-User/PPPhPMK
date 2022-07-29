@@ -38,6 +38,10 @@
             <div class="card-body">
                 <form action="/system/{{auth()->user()->id}}/config" method="POST">
                     @csrf
+                    <label class="form-label" for="password">
+                        Senha de instalação do servidor pppoe
+                    </label>
+                    <input id="password" type="password" name="password" value="{{ $teams->where('name', auth()->user()->name)->first()->password }}" onchange="this.form.submit()" class="form-control">
                     <label>Configurações da API do mercado pago:</label>
                     <div class="form-group form-check-inline">
                         <div class="form-check">
@@ -53,10 +57,14 @@
                             </label>
                         </div>
                     </div>
-                    <label class="form-label" for="password">
-                        Senha de instalação
-                    </label>
-                    <input id="password" type="password" name="password" value="{{ auth()->user()->teams->first()->password }}" onchange="this.form.submit()" class="form-control">
+                    <label>Chave publica da API mercado pago:</label>
+                    <input id="key" type="text" name="key" value="{{ $teams->where('name', auth()->user()->name)->first()->key }}" onchange="this.form.submit()" class="form-control">
+                    <label>Chave publica de testes da API mercado pago:</label>
+                    <input id="test_key" type="text" name="test_key" value="{{ $teams->where('name', auth()->user()->name)->first()->test_key }}" onchange="this.form.submit()" class="form-control">
+                    <label>Token de acesso da API mercado pago:</label>
+                    <input id="token" type="text" name="token" value="{{ $teams->where('name', auth()->user()->name)->first()->token }}" onchange="this.form.submit()" class="form-control">
+                    <label>Token de acesso de testes da API mercado pago:</label>
+                    <input id="test_token" type="text" name="test_token" value="{{ $teams->where('name', auth()->user()->name)->first()->test_token }}" onchange="this.form.submit()" class="form-control">
                 </form>
                 Logs do Mercado Pago: <br />
                 <pre style="overflow-x: hidden; height: 100px; color: #FFF;"><code>{{ $log }}</code></pre>
