@@ -9,14 +9,14 @@ e ultimos conceitos aprendidos.
 O novo site contará com:
 
 - [x] Deploy automático com o GitHub
-- [] Documentação para apresebtação e utilização;
+- [ ] Documentação para apresebtação e utilização;
 - [x] CRUD básico baseado no modelo do site antigo;
 - [x] Opção para utilizar com Sqlite;
 - [x] Feito com Laravel 9;
 - [x] Template atualizado para o front-end;
-- [-] Implementação do intergram;
+- [ ] Implementação do intergram;
 - [x] Melhorias para o sistema de login & authentication;
-- [-] Utilizar o minimo de ganbiarras possivel;
+- [ ] Utilizar o minimo de ganbiarras possivel;
 
 ## Sponsors
 
