@@ -2,28 +2,28 @@
 
 ## About
 
-O intuito desse projeto é refazer o site(<a href="https://dev.unixlocal.tk" target="_blank">unixlocal.tk</a>) implementando as
+O intuito desse projeto é refazer o site(<a href="https://github.com/Unix-User/MP_unixlocal" target="_blank">unixlocal.tk</a>) implementando as
 features desenvolvidas nos ultimos projetos(simpleppphpmk && simpleppphp-mk-api)
 e ultimos conceitos aprendidos.
 
 O novo site contará com:
 
-- Deploy automático com o GitHub
-- Documentação para apresebtação e utilização;
-- CRUD básico baseado no modelo do site antigo;
-- Opção para utilizar com Sqlite;
-- Feito com Laravel 9;
-- Template atualizado para o front-end;
-- Implementação do intergram;
-- Melhorias para o sistema de login & authentication;
-- Utilizar o minimo de ganbiarras possivel;
+[x] Deploy automático com o GitHub
+[] Documentação para apresebtação e utilização;
+[x] CRUD básico baseado no modelo do site antigo;
+[x] Opção para utilizar com Sqlite;
+[x] Feito com Laravel 9;
+[x] Template atualizado para o front-end;
+[-] Implementação do intergram;
+[x] Melhorias para o sistema de login & authentication;
+[-] Utilizar o minimo de ganbiarras possivel;
 
 ## Sponsors
 
 we are looking for sponsors for this project.
 
 ### Partners
-- **[Leonardo](https://leonet.ml)**
+- **[Leonardo](mailto:leonardo.85.rodrigues@gmail.com)**
 
 ## Contributing
 
