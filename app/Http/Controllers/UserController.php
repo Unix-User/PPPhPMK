@@ -322,7 +322,7 @@ class UserController extends Controller
         $item->unit_price = $user->contracts->last()->product->price;
         $preference->items = array($item);
         $preference->external_reference = $user->contracts->last()->reference;
-        $preference->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks?cliente='. $user->teams->first()->name;
+        $preference->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks&cliente='. $user->teams->first()->name;
         $preference->back_urls = (object) [
             "success" => env('APP_URL') . "/user/" . $user->id . "/show",
             "failure" => env('APP_URL') . "/user/" . $user->id . "/show",
@@ -336,7 +336,7 @@ class UserController extends Controller
         $payment->description = $user->contracts->last()->product->name;
         $payment->payment_method_id = "pix";
         $payment->external_reference = $user->contracts->last()->reference;
-        $payment->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks?cliente='. $user->teams->first()->name;
+        $payment->notification_url = env('APP_URL') . '/api/processar_pagamento?source_news=webhooks&cliente='. $user->teams->first()->name;
         $payment->payer = array(
             "email" => $user->email,
             "first_name" => $user->name,
@@ -358,11 +358,12 @@ class UserController extends Controller
     public function processar_pagamento(Request $request)
     {
         $input = $request->all();
-        $token = env('MP_ACCESS_TOKEN');
-        if (User::where('name', $input['cliente'])->teams->first()->mode == 'dev') {
-            $token = env('Test_MP_ACCESS_TOKEN');
+        $team = Team::where('name', $input['cliente'])->first();
+        $token = ($team->token) ? $team->token : env('MP_ACCESS_TOKEN');
+        if ($team->mode == 'dev') {
+            $token = ($team->test_token) ? $team->test_token : env('Test_MP_ACCESS_TOKEN');
         }
-        $log = 'nova requisição:' . $input["data"]["id"];
+        $log = "\n".'nova requisição:' . $input["data"]["id"]. "\n";
         SDK::setAccessToken($token);
         switch ($input["type"]) {
             case "payment":
@@ -370,6 +371,7 @@ class UserController extends Controller
                 if ($payment->status == "approved") {
                     $contract = Contract::where('reference', $payment->external_reference);
                     $contract->update(['updated_at' => $payment->date_approved]);
+                    $log .= $payment->status . ' - ' . $payment->date_approved . "\n";
                 }
                 break;
             case "plan":
@@ -385,8 +387,9 @@ class UserController extends Controller
                 // $_POST contém as informações relacionadas à notificação.
                 break;
         }
-        $log .= "\n" . $request->all() . "\n";
-        $log .= file_get_contents(public_path() . '/log.txt');
+        //$log .= "\n" . $request->all() . "\n";
+        $log .= "status de pagamento atualizado para: " . $payment->external_reference . "\n";
+        $log .= file_get_contents(public_path() . "/log.txt");
         file_put_contents(public_path() . '/log.txt', $log);
         return response()->json(['status' => 'created'], 201);
     }
