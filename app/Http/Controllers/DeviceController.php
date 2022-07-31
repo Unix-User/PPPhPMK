@@ -54,9 +54,10 @@ class DeviceController extends Controller
                         'board_name' => '---'
                     ];
                 }
-                $detailed =  (new Collection($items))->paginate(3);
+                
             }
         }
+        $detailed =  (new Collection($items))->paginate(3);
         return view('devices.index', compact('detailed'));
     }
 
