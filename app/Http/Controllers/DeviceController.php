@@ -195,6 +195,9 @@ class DeviceController extends Controller
             $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
             if ($d2 + 30  < 1) {
                 $profile = 'notificar';
+                if ($d2 + 45  < 1) {
+                    $profile = 'bloqueio';
+                }
             } else {
                 $profilePrintRequest = new RouterOS\Request('/ppp profile print');
                 $profilePrintRequest->setArgument('.proplist', '.id');
