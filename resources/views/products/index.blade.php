@@ -53,7 +53,7 @@
                             <a class="clean icon solid fa-edit" href="/product/{{ $product->id }}/edit"></a>
                             <a class="clean icon solid fa-trash" href="/product/{{ $product->id }}/delete" onclick="return confirm('Deletar esse intem?')"></a>
                             @else
-                            <a class="clean icon solid fa-shopping-cart" href="/product/{{ $product->id }}/select"></a>
+                            <a class="clean ask icon solid fa-shopping-cart" onclick="" href="/product/{{ $product->id }}/select"></a>
                             @endif
                         </small>
                     </div>
@@ -69,5 +69,7 @@
 @endsection
 
 @push('scripts')
-
+<script>
+$('.ask').click( function(e) {e.preventDefault(); return confirm('Tem certeza que deseja mudar o seu plano? Ao confirmar seu usuário será designado para o time tecnico especifcado no plano selecionado e um novo contrato será gerado para o seu plano. A ativação será processada ao finalizar o pagamento!')} );
+</script>
 @endpush
