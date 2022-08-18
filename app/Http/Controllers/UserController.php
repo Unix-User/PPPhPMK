@@ -207,7 +207,7 @@ class UserController extends Controller
         if ($user->contracts->last()->product_id != $product->id) {
             $user->contracts()->create(['user_id' => $user->id, 'product_id' => $product->id, 'reference' => Uuid::uuid4(), 'created_at' => now()]);
         }
-        return redirect('/user/' . Auth::user()->id . '/show')->with('success', 'User updated successfully');
+        return redirect('/user/' . $id . '/show')->with('success', 'User updated successfully');
     }
 
     public function delete($id)
