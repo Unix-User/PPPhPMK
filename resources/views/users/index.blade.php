@@ -36,9 +36,9 @@
                 <th>usuário</th>
                 <th class="d-none d-lg-table-cell ">telefone</th>
                 <th class="d-none d-lg-table-cell ">email</th>
-                <th class="d-none d-lg-table-cell ">product</th>
-                <th class="d-none d-lg-table-cell ">team</th>
-                <th class="d-none d-lg-table-cell ">expires_at</th>
+                <th class="d-none d-lg-table-cell ">produto</th>
+                <th class="d-none d-lg-table-cell ">time</th>
+                <th class="d-none d-lg-table-cell ">expiração</th>
                 <th class="text-right">
                     <a href="/user/create" class="icon solid fa-plus special"></a>
                 </th>
@@ -85,7 +85,7 @@
                         @if($user->contracts->last())
                         @php
                         $date = new DateTime($user->contracts->last()->created_at);
-                        $date->add(new DateInterval('P1M'));
+                        $date->add(new DateInterval('P30D'));
                         echo $date->format('d/m/Y H:i:s');
                         @endphp
                         @endif
