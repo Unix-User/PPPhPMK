@@ -36,36 +36,11 @@ class DeviceSync extends Command
             $c1 = strtotime($owner->contracts->last()->updated_at);
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
-            if ($c2 + 30  < 1) {
-
+            if (($c2 + 30  < 1) || ($owner->teams()->first()->name != 'Administrador')) {
                 $info = "Processo de sincronizacao abortado para " . $owner->name . ", verifique o painel de controle no site.";
                 $request = new RouterOS\Request('/log info');
                 $request->setArgument('message', $info);
                 $client->sendSync($request);
-
-
-                $printRequest = new RouterOS\Request('/system scheduler print');
-                $printRequest->setArgument('.proplist', '.id');
-                $printRequest->setQuery(RouterOS\Query::where('name', 'reboot'));
-                $id = $client->sendSync($printRequest)->getProperty('.id');
-
-                $request = new RouterOS\Request('/system scheduler remove');
-                $request->setArgument('numbers', $id);
-                $client->sendSync($request);
-
-                $util = new RouterOS\Util($client);
-                $util->setMenu('/system scheduler')->add(
-                    array(
-                        'name' => 'reboot',
-                        'interval' => '1d',
-                        'start-time' => '4:30:00',
-                        'on-event' => RouterOS\Script::prepare(
-                            '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
-                /ppp profile remove [find where comment="Perfil criado pelo sistema -' . $owner->name . '"];
-                system reboot'
-                        )
-                    )
-                );
             } else {
                 foreach (User::all() as $user) {
                     $request = new RouterOS\Request('/ppp secret remove');
@@ -117,6 +92,29 @@ class DeviceSync extends Command
                 $request->setArgument('message', $info);
                 $client->sendSync($request);
             }
+
+            $printRequest = new RouterOS\Request('/system scheduler print');
+            $printRequest->setArgument('.proplist', '.id');
+            $printRequest->setQuery(RouterOS\Query::where('name', 'reboot'));
+            $id = $client->sendSync($printRequest)->getProperty('.id');
+
+            $request = new RouterOS\Request('/system scheduler remove');
+            $request->setArgument('numbers', $id);
+            $client->sendSync($request);
+
+            $util = new RouterOS\Util($client);
+            $util->setMenu('/system scheduler')->add(
+                array(
+                    'name' => 'reboot',
+                    'interval' => '1d',
+                    'start-time' => '4:30:00',
+                    'on-event' => RouterOS\Script::prepare(
+                        '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
+                /ppp profile remove [find where comment="Perfil criado pelo sistema -' . $owner->name . '"];
+                system reboot'
+                    )
+                )
+            );
         }
     }
 }
