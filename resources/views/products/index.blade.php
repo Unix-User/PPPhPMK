@@ -70,6 +70,12 @@
 
 @push('scripts')
 <script>
-$('.ask').click( function(e) {e.preventDefault(); return confirm('Tem certeza que deseja mudar o seu plano? Ao confirmar seu usuário será designado para o time tecnico especifcado no plano selecionado e um novo contrato será gerado para o seu plano. A ativação será processada ao finalizar o pagamento!')} );
+var elems = document.getElementsByClassName('ask');
+    var confirmIt = function (e) {
+        if (!confirm('Tem certeza que deseja mudar o seu plano? Ao confirmar seu usuário será designado para o time tecnico especifcado no plano selecionado e um novo contrato será gerado para o seu plano. A ativação será processada ao finalizar o pagamento!')) e.preventDefault();
+    };
+    for (var i = 0, l = elems.length; i < l; i++) {
+        elems[i].addEventListener('click', confirmIt, false);
+    }
 </script>
 @endpush
