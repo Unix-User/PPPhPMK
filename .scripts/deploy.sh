@@ -29,3 +29,4 @@ php artisan migrate --force
 php artisan up
 
 echo "Deployment finished!"
+exit

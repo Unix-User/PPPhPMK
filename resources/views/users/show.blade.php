@@ -43,7 +43,12 @@
             </div>
             <div class="card-footer">
                 <ul class="actions">
-                    <li><a href="/products" class="button">Selecionar outro plano</a></li>
+                    <li><a href="/products" class="button">
+                            @if ($user->teams->first()->name == 'administrador')
+                            Selecionar outro plano
+                            @else()
+                            Gerenciar planos para venda
+                            @endif</a></li>
                 </ul>
             </div>
         </a>
@@ -77,47 +82,47 @@
         <div class="card-body">
             <div class="form-group row">
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->name }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->name }}" readonly />
                     <label class="text-muted">Usuário: </label>
                 </div>
                 <div class="col-md-5 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->email }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->email }}" readonly />
                     <label class="text-muted">Email: </label>
                 </div>
                 <div class="col-md-4 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->phone }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->phone }}" readonly />
                     <label class="text-muted">Telefone: </label>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->cep }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->cep }}" readonly />
                     <label class="text-muted">CEP: </label>
                 </div>
                 <div class="col-md-4 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->bairro }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->bairro }}" readonly />
                     <label class="text-muted">Bairro: </label>
                 </div>
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->cidade }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->cidade }}" readonly />
                     <label class="text-muted">Cidade: </label>
                 </div>
                 <div class="col-md-2 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->uf }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->uf }}" readonly />
                     <label class="text-muted">Estado: </label>
                 </div>
             </div>
             <div class="form-group row">
                 <div class="col-md-7 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->rua }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->rua }}" readonly />
                     <label class="text-muted">Rua: </label>
                 </div>
                 <div class="col-md-2 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->num }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->num }}" readonly />
                     <label class="text-muted">Nº: </label>
                 </div>
                 <div class="col-md-3 col-md-offset-0">
-                    <input type="text" class="form-control-sm" value="{{ $user->complemento }}" readonly/>
+                    <input type="text" class="form-control-sm" value="{{ $user->complemento }}" readonly />
                     <label class="text-muted">Complemento: </label>
                 </div>
             </div>
@@ -143,9 +148,9 @@
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th class="d-none d-lg-table-cell ">reference</th>
-                    <th class="d-none d-lg-table-cell ">Data</th>
-                    <th>Status</th>
+                    <th class="d-none d-lg-table-cell ">Referencia</th>
+                    <th class="d-none d-lg-table-cell ">Contratação</th>
+                    <th>Habilitação</th>
                 </tr>
             </thead>
             <tbody>
