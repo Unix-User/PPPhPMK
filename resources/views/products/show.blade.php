@@ -21,7 +21,7 @@
             <div class="card-footer">
                 <ul class="actions">
                     <li>
-                        <a href="/product/{{ $product->id }}/select" class="button">Selecionar</a>
+                        <a href="/product/{{ $product->id }}/select" class="button" onclick="confirm('Tem certeza que deseja mudar o seu plano? Ao confirmar seu usuário será designado para o time tecnico especifcado no plano selecionado e um novo contrato será gerado para o seu plano. A ativação será processada ao finalizar o pagamento!')">Selecionar</a>
                     </li>
                 </ul>
             </div>
