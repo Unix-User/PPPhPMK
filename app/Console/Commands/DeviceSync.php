@@ -48,6 +48,11 @@ class DeviceSync extends Command
                 $client->sendSync($request);
             } else {
                 foreach (User::all() as $user) {
+
+                    $request = new RouterOS\Request('/system note set');
+                    $request->setArgument('show-at-login', 'no');
+                    $client->sendSync($request);
+
                     $request = new RouterOS\Request('/ppp secret remove');
                     $printRequest = new RouterOS\Request('/ppp secret print');
                     $printRequest->setArgument('.proplist', '.id');
