@@ -44,7 +44,7 @@
             <div class="card-footer">
                 <ul class="actions">
                     <li><a href="/products" class="button">
-                            @if ($user->teams->first()->name == 'administrador')
+                            @if ($user->teams->first()->name != 'administrador')
                             Selecionar outro plano
                             @else()
                             Gerenciar planos para venda
