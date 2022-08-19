@@ -51,41 +51,43 @@ class DeviceSync extends Command
                 $request->setArgument('show-at-login', 'no');
                 $client->sendSync($request);
                 foreach (User::all() as $user) {
-                    $request = new RouterOS\Request('/ppp secret remove');
-                    $printRequest = new RouterOS\Request('/ppp secret print');
-                    $printRequest->setArgument('.proplist', '.id');
-                    $printRequest->setQuery(RouterOS\Query::where('name', $user->name));
-                    $id = $client->sendSync($printRequest)->getProperty('.id');
+                    if ($user->teams->last()->name == $owner->name) {
+                        $request = new RouterOS\Request('/ppp secret remove');
+                        $printRequest = new RouterOS\Request('/ppp secret print');
+                        $printRequest->setArgument('.proplist', '.id');
+                        $printRequest->setQuery(RouterOS\Query::where('name', $user->name));
+                        $id = $client->sendSync($printRequest)->getProperty('.id');
 
-                    $request = new RouterOS\Request('/ppp secret remove');
-                    $request->setArgument('numbers', $id);
-                    $client->sendSync($request);
-
-                    $d1 = strtotime($user->contracts->last()->updated_at);
-                    $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
-                    if ($d2 + 30  < 1) {
-                        $profile = 'notificar';
-                        if ($d2 + 45  < 1) {
-                            $profile = 'bloqueio';
-                        }
-                    } else {
-                        $profilePrintRequest = new RouterOS\Request('/ppp profile print');
-                        $profilePrintRequest->setArgument('.proplist', '.id');
-                        $profilePrintRequest->setQuery(RouterOS\Query::where('name', $user->name));
-                        $id = $client->sendSync($profilePrintRequest)->getProperty('.id');
-
-                        $request = new RouterOS\Request('/ppp profile remove');
+                        $request = new RouterOS\Request('/ppp secret remove');
                         $request->setArgument('numbers', $id);
                         $client->sendSync($request);
 
-                        $request = new RouterOS\Request('/ppp profile add');
-                        $request->setArgument('name', $user->name);
-                        if ($user->contracts->last()->product->tags != null) {
-                            $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
+                        $d1 = strtotime($user->contracts->last()->updated_at);
+                        $d2 = ceil(($d1 - time()) / 60 / 60 / 24);
+                        if ($d2 + 30  < 1) {
+                            $profile = 'notificar';
+                            if ($d2 + 45  < 1) {
+                                $profile = 'bloqueio';
+                            }
+                        } else {
+                            $profilePrintRequest = new RouterOS\Request('/ppp profile print');
+                            $profilePrintRequest->setArgument('.proplist', '.id');
+                            $profilePrintRequest->setQuery(RouterOS\Query::where('name', $user->name));
+                            $id = $client->sendSync($profilePrintRequest)->getProperty('.id');
+
+                            $request = new RouterOS\Request('/ppp profile remove');
+                            $request->setArgument('numbers', $id);
+                            $client->sendSync($request);
+
+                            $request = new RouterOS\Request('/ppp profile add');
+                            $request->setArgument('name', $user->name);
+                            if ($user->contracts->last()->product->tags != null) {
+                                $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
+                            }
+                            $request->setArgument('comment', 'Perfil criado pelo sistema - ' . $owner->teams()->first()->name);
+                            $client->sendSync($request);
+                            $profile = $user->name;
                         }
-                        $request->setArgument('comment', 'Perfil criado pelo sistema - ' . $owner->teams()->first()->name);
-                        $client->sendSync($request);
-                        $profile = $user->name;
                     }
                     $request = new RouterOS\Request('/ppp secret add');
                     $request->setArgument('name', $user->name);
