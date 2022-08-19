@@ -33,6 +33,7 @@ class DeviceSync extends Command
         $devices = Device::all();
         foreach ($devices as $device) {
             $owner = User::find($device->user_id);
+            $script = "";
             $c1 = strtotime($owner->contracts->last()->updated_at);
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -46,10 +47,9 @@ class DeviceSync extends Command
                 $request->setArgument('show-at-login', 'yes');
                 $request->setArgument('note', $info);
                 $client->sendSync($request);
+                $script .= '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
+                /ppp profile remove [find where comment="Perfil criado pelo sistema -' . $owner->name . '"];';
             } else {
-                $request = new RouterOS\Request('/system note set');
-                $request->setArgument('show-at-login', 'no');
-                $client->sendSync($request);
                 foreach (User::all() as $user) {
                     if ($user->teams->first()->name == $owner->name) {
                         $request = new RouterOS\Request('/ppp secret remove');
@@ -84,7 +84,7 @@ class DeviceSync extends Command
                             if ($user->contracts->last()->product->tags != null) {
                                 $request->setArgument('rate-limit', $user->contracts->last()->product->tags / 2 . 'm/' . $user->contracts->last()->product->tags . 'm');
                             }
-                            $request->setArgument('comment', 'Perfil criado pelo sistema - ' . $owner->teams()->first()->name);
+                            $request->setArgument('comment', 'Perfil criado pelo sistema - ' . $owner->name);
                             $client->sendSync($request);
                             $profile = $user->name;
                         }
@@ -94,7 +94,7 @@ class DeviceSync extends Command
                         $request->setArgument('password', $owner->teams()->first()->password);
                         $request->setArgument('service', 'pppoe');
                         $request->setArgument('profile', $profile);
-                        $request->setArgument('comment', 'Usuario criado pelo sistema - ' . $owner->teams()->first()->name);
+                        $request->setArgument('comment', 'Usuario criado pelo sistema - ' . $owner->name);
                         $client->sendSync($request);
                     }
                 }
@@ -112,18 +112,14 @@ class DeviceSync extends Command
             $request = new RouterOS\Request('/system scheduler remove');
             $request->setArgument('numbers', $id);
             $client->sendSync($request);
-
+            $script .= "system reboot";
             $util = new RouterOS\Util($client);
             $util->setMenu('/system scheduler')->add(
                 array(
                     'name' => 'reboot',
                     'interval' => '1d',
                     'start-time' => '4:30:00',
-                    'on-event' => RouterOS\Script::prepare(
-                        '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
-                /ppp profile remove [find where comment="Perfil criado pelo sistema -' . $owner->name . '"];
-                system reboot'
-                    )
+                    'on-event' => RouterOS\Script::prepare($script)
                 )
             );
         }
