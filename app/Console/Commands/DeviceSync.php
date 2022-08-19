@@ -48,7 +48,7 @@ class DeviceSync extends Command
                 $request->setArgument('note', $info);
                 $client->sendSync($request);
                 $script .= '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
-                /ppp profile remove [find where comment="Perfil criado pelo sistema -' . $owner->name . '"];';
+                /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
             } else {
                 foreach (User::all() as $user) {
                     if ($user->teams->first()->name == $owner->name) {
