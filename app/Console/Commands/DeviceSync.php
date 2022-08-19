@@ -33,7 +33,8 @@ class DeviceSync extends Command
         $devices = Device::all();
         foreach ($devices as $device) {
             $owner = User::find($device->user_id);
-            $script = '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
+            $script = "";
+            $script .= '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
                 /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
             $c1 = strtotime($owner->contracts->last()->updated_at);
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
