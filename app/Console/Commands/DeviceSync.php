@@ -106,19 +106,18 @@ class DeviceSync extends Command
 
             $printRequest = new RouterOS\Request('/system scheduler print');
             $printRequest->setArgument('.proplist', '.id');
-            $printRequest->setQuery(RouterOS\Query::where('name', 'reboot'));
+            $printRequest->setQuery(RouterOS\Query::where('name', $owner->name.'-sync'));
             $id = $client->sendSync($printRequest)->getProperty('.id');
 
             $request = new RouterOS\Request('/system scheduler remove');
             $request->setArgument('numbers', $id);
             $client->sendSync($request);
-            $script .= "system reboot";
             $util = new RouterOS\Util($client);
             $util->setMenu('/system scheduler')->add(
                 array(
-                    'name' => 'reboot',
+                    'name' => $owner->name.'-sync',
                     'interval' => '1d',
-                    'start-time' => '4:30:00',
+                    'start-time' => '4:00:00',
                     'on-event' => RouterOS\Script::prepare($script)
                 )
             );
