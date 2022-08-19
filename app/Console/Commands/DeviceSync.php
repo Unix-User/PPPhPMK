@@ -51,7 +51,7 @@ class DeviceSync extends Command
                 $request->setArgument('show-at-login', 'no');
                 $client->sendSync($request);
                 foreach (User::all() as $user) {
-                    if ($user->teams->last()->name == $owner->name) {
+                    if ($user->teams->first()->name == $owner->name) {
                         $request = new RouterOS\Request('/ppp secret remove');
                         $printRequest = new RouterOS\Request('/ppp secret print');
                         $printRequest->setArgument('.proplist', '.id');
