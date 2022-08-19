@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
     {
         
         $schedule->command('device:sync')
-        ->everyMinute();
+        ->everyFiveMinutes();
     }
 
     /**
