@@ -98,7 +98,7 @@ class DeviceSync extends Command
                         $client->sendSync($request);
                     }
                 }
-                $info = 'Processo de sincronização para ' . $owner->name . ' finalizado com sucesso.';
+                $info = 'Processo de sincronizacao para ' . $owner->name . ' finalizado com sucesso.';
                 $request = new RouterOS\Request('/log info');
                 $request->setArgument('message', $info);
                 $client->sendSync($request);
