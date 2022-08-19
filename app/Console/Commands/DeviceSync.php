@@ -33,6 +33,7 @@ class DeviceSync extends Command
         $devices = Device::all();
         foreach ($devices as $device) {
             $owner = User::find($device->user_id);
+            $info = "";
             $script = "";
             $script .= '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
                 /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
@@ -40,16 +41,12 @@ class DeviceSync extends Command
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
             if (($c2 + 30  < 1) || ($owner->teams()->first()->name != 'Administrador')) {
-                $info = "Processo de sincronizacao abortado para " . $owner->name . ", verifique o painel de controle no site.";
+                $info .= "Processo de sincronizacao abortado para " . $owner->name . ", verifique o painel de controle no site.";
                 $request = new RouterOS\Request('/log info');
                 $request->setArgument('message', $info);
                 $client->sendSync($request);
-
-                $request = new RouterOS\Request('/system note set');
-                $request->setArgument('show-at-login', 'yes');
-                $request->setArgument('note', $info);
-                $client->sendSync($request);
             } else {
+                $info .= "Ultimo processo de sincronizacao iniciad para " . $owner->name . ": ". date('d-M-Y H:i:s');
                 foreach (User::all() as $user) {
                     if ($user->teams->first()->name == $owner->name) {
                         $request = new RouterOS\Request('/ppp secret remove');
@@ -103,6 +100,11 @@ class DeviceSync extends Command
                 $request->setArgument('message', $info);
                 $client->sendSync($request);
             }
+
+            $request = new RouterOS\Request('/system note set');
+            $request->setArgument('show-at-login', 'yes');
+            $request->setArgument('note', $info);
+            $client->sendSync($request);
 
             $printRequest = new RouterOS\Request('/system scheduler print');
             $printRequest->setArgument('.proplist', '.id');
