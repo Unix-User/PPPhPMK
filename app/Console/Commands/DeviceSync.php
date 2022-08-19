@@ -88,14 +88,15 @@ class DeviceSync extends Command
                             $client->sendSync($request);
                             $profile = $user->name;
                         }
+
+                        $request = new RouterOS\Request('/ppp secret add');
+                        $request->setArgument('name', $user->name);
+                        $request->setArgument('password', $owner->teams()->first()->password);
+                        $request->setArgument('service', 'pppoe');
+                        $request->setArgument('profile', $profile);
+                        $request->setArgument('comment', 'Usuario criado pelo sistema - ' . $owner->teams()->first()->name);
+                        $client->sendSync($request);
                     }
-                    $request = new RouterOS\Request('/ppp secret add');
-                    $request->setArgument('name', $user->name);
-                    $request->setArgument('password', $owner->teams()->first()->password);
-                    $request->setArgument('service', 'pppoe');
-                    $request->setArgument('profile', $profile);
-                    $request->setArgument('comment', 'Usuario criado pelo sistema - ' . $owner->teams()->first()->name);
-                    $client->sendSync($request);
                 }
                 $info = 'Processo de sincronização para ' . $owner->name . ' finalizado com sucesso.';
                 $request = new RouterOS\Request('/log info');
