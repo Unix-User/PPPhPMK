@@ -84,7 +84,7 @@
                     <th class="d-none d-lg-table-cell">
                         @if($user->contracts->last())
                         @php
-                        $date = new DateTime($user->contracts->last()->created_at);
+                        $date = new DateTime($user->contracts->last()->updated_at);
                         $date->add(new DateInterval('P30D'));
                         echo $date->format('d/m/Y H:i:s');
                         @endphp
