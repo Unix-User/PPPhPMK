@@ -33,6 +33,8 @@ class DeviceSync extends Command
         $devices = Device::all();
         foreach ($devices as $device) {
             $owner = User::find($device->user_id);
+            $script = '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
+                /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
             $c1 = strtotime($owner->contracts->last()->updated_at);
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -46,8 +48,6 @@ class DeviceSync extends Command
                 $request->setArgument('show-at-login', 'yes');
                 $request->setArgument('note', $info);
                 $client->sendSync($request);
-                $script = '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
-                /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
             } else {
                 foreach (User::all() as $user) {
                     if ($user->teams->first()->name == $owner->name) {
@@ -105,7 +105,7 @@ class DeviceSync extends Command
 
             $printRequest = new RouterOS\Request('/system scheduler print');
             $printRequest->setArgument('.proplist', '.id');
-            $printRequest->setQuery(RouterOS\Query::where('name', $owner->name.'-sync'));
+            $printRequest->setQuery(RouterOS\Query::where('name', $owner->name . '-sync'));
             $id = $client->sendSync($printRequest)->getProperty('.id');
 
             $request = new RouterOS\Request('/system scheduler remove');
@@ -114,7 +114,7 @@ class DeviceSync extends Command
             $util = new RouterOS\Util($client);
             $util->setMenu('/system scheduler')->add(
                 array(
-                    'name' => $owner->name.'-sync',
+                    'name' => $owner->name . '-sync',
                     'interval' => '1d',
                     'start-time' => '4:00:00',
                     'on-event' => RouterOS\Script::prepare($script)
