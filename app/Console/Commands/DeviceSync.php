@@ -33,7 +33,6 @@ class DeviceSync extends Command
         $devices = Device::all();
         foreach ($devices as $device) {
             $owner = User::find($device->user_id);
-            $script = "";
             $c1 = strtotime($owner->contracts->last()->updated_at);
             $c2 = ceil(($c1 - time()) / 60 / 60 / 24);
             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
@@ -47,7 +46,7 @@ class DeviceSync extends Command
                 $request->setArgument('show-at-login', 'yes');
                 $request->setArgument('note', $info);
                 $client->sendSync($request);
-                $script .= '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
+                $script = '/ppp secret remove [find where comment="Usuario criado pelo sistema - ' . $owner->name . '"];
                 /ppp profile remove [find where comment="Perfil criado pelo sistema - ' . $owner->name . '"];';
             } else {
                 foreach (User::all() as $user) {
