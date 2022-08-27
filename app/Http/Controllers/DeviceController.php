@@ -45,7 +45,6 @@ class DeviceController extends Controller
 
                 if (!isset($error)) {
                     $responses = $client->sendSync(new RouterOS\Request('/system resource print'));
-                    dd($responses);
                     foreach ($responses as $response) {
                         if ($response->getType() === RouterOS\Response::TYPE_DATA) {
                             $uptime = $response->getProperty('uptime');
