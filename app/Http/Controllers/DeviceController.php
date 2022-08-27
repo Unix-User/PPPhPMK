@@ -25,39 +25,55 @@ class DeviceController extends Controller
         $devices = Device::all();
         $detailed = new stdClass();
         $items = [];
+        $status = "";
         foreach ($devices as $device) {
+            $error = null;
             if (($device->user_id == auth()->user()->id) || (auth()->user()->id == 1)) {
-                try {
-                    $client = new RouterOS\Client($device->ip, $device->user, $device->password);
-                    $response = $client->sendSync(new RouterOS\Request('/system resource print'));
-                    $items[$device->id] = [
-                        'id' => $device->id,
-                        'name' => $device->name,
-                        'ip' => $device->ip,
-                        'user' => $device->user,
-                        'password' => $device->password,
-                        'uptime' => $response->getProperty('uptime'),
-                        'cpu_load' => $response->getProperty('cpu-load'),
-                        'version' => $response->getProperty('version'),
-                        'board_name' => $response->getProperty('board-name')
-                    ];
-                } catch (Exception $e) {
-                    $items[$device->id] = [
-                        'id' => $device->id,
-                        'name' => $device->name,
-                        'ip' => $device->ip,
-                        'user' => $device->user,
-                        'password' => $device->password,
-                        'uptime' => 'off-line',
-                        'cpu_load' => '---',
-                        'version' => '---',
-                        'board_name' => '---'
-                    ];
+                $ports = array(8728, 8729);
+                foreach ($ports as $port) {
+                    $connection = @fsockopen($device->ip, $port, $errno, $errstr, 1);
+                    if (is_resource($connection)) {
+                        fclose($connection);
+                        try {
+                            $client = new RouterOS\Client($device->ip, $device->user, $device->password);
+                        } catch (Exception $e) {
+                            $error = 'Não foi possivel conectar ao dispositivo ' . $device->name;
+                            // $status .= $error;
+                            echo $error;
+                        }
+                    }
                 }
-                
+
+                if (!isset($error)) {
+                    $responses = $client->sendSync(new RouterOS\Request('/system resource print'));
+                    dd($responses);
+                    foreach ($responses as $response) {
+                        if ($response->getType() === RouterOS\Response::TYPE_DATA) {
+                            $uptime = $response->getProperty('uptime');
+                            $cpu = $response->getProperty('cpu-load');
+                            $version = $response->getProperty('version');
+                            $board = $response->getProperty('board-name');
+                        }
+                    }
+                }
+
+                $items[$device->id] = [
+                    'id' => $device->id,
+                    'name' => $device->name,
+                    'ip' => $device->ip,
+                    'user' => $device->user,
+                    'password' => $device->password,
+                    'uptime' => (isset($uptime)) ? $uptime : 'off-line',
+                    'cpu_load' => (isset($cpu)) ? $cpu : '--',
+                    'version' => (isset($version)) ? $version : '--',
+                    'board_name' => (isset($board)) ? $board : '--'
+                ];
             }
         }
         $detailed =  (new Collection($items))->paginate(3);
+        if ($status != "") {
+            return view('devices.index', compact('detailed'))->with('error', $error);
+        }
         return view('devices.index', compact('detailed'));
     }
 
