@@ -25,7 +25,6 @@ class DeviceController extends Controller
         $devices = Device::all();
         $detailed = new stdClass();
         $items = [];
-        $status = "";
         foreach ($devices as $device) {
             $error = null;
             if (($device->user_id == auth()->user()->id) || (auth()->user()->id == 1)) {
@@ -38,9 +37,9 @@ class DeviceController extends Controller
                             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
                         } catch (Exception $e) {
                             $error = 'Não foi possivel conectar ao dispositivo ' . $device->name;
-                            // $status .= $error;
-                            echo $error;
                         }
+                    } else {
+                        $error = "O dispositivo especificado não esta online";
                     }
                 }
 
@@ -71,7 +70,7 @@ class DeviceController extends Controller
             }
         }
         $detailed =  (new Collection($items))->paginate(3);
-        if ($status != "") {
+        if (!isset($error)) {
             return view('devices.index', compact('detailed'))->with('error', $error);
         }
         return view('devices.index', compact('detailed'));
