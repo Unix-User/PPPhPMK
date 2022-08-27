@@ -42,10 +42,7 @@ class DeviceController extends Controller
                         $error = "O dispositivo especificado não esta online";
                     }
                 }
-                $uptime = null;
-                $cpu = null;
-                $version = null;
-                $board = null;
+                unset ($uptime, $cpu, $version, $board);
                 if (!isset($error)) {
                     $responses = $client->sendSync(new RouterOS\Request('/system resource print'));
                     foreach ($responses as $response) {
