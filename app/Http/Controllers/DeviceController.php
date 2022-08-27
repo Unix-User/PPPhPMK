@@ -36,7 +36,7 @@ class DeviceController extends Controller
                         try {
                             $client = new RouterOS\Client($device->ip, $device->user, $device->password);
                         } catch (Exception $e) {
-                            $error = 'Não foi possivel conectar ao dispositivo ' . $device->name;
+                            $error = 'Não foi possivel conectar ao dispositivo ' . $device->name . ' error: ' . $e;
                         }
                     } else {
                         $error = "O dispositivo especificado não esta online";
