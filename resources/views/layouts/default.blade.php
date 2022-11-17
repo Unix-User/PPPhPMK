@@ -58,12 +58,12 @@
 
         <footer id="footer">
             <ul class="icons">
-                <li><a href="https://twitter.com/***REMOVED***" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+                <li><a href="https://twitter.com/wevertonslima" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
                 <li><a href="https://wa.me/5534988291040" class="icon brands alt fa-whatsapp"><span class="label">Whatsapp</span></a></li>
                 <li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
-                <li><a href="https://t.me/***REMOVED***" class="icon brands alt fa-telegram"><span class="label">Telegram</span></a></li>
+                <li><a href="https://t.me/wevertonslima" class="icon brands alt fa-telegram"><span class="label">Telegram</span></a></li>
                 <li><a href="https://github.com/Unix-User" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
-                <li><a href="mailto:***REMOVED***@gmail.com" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
+                <li><a href="mailto:wevertonslima@gmail.com" class="icon solid alt fa-envelope"><span class="label">Email</span></a></li>
             </ul>
             <ul class="copyright">
                 <li>&copy; MPRadFramework. All rights reserved.</li>

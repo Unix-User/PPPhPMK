@@ -94,10 +94,10 @@
             <!-- Footer -->
             <footer id="footer">
                 <ul class="icons">
-                    <li><a href="https://twitter.com/***REMOVED***" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
-                    <li><a href="https://t.me/***REMOVED***" class="icon alt fa-telegram"><span class="label">Telegram</span></a></li>
+                    <li><a href="https://twitter.com/wevertonslima" class="icon alt fa-twitter"><span class="label">Twitter</span></a></li>
+                    <li><a href="https://t.me/wevertonslima" class="icon alt fa-telegram"><span class="label">Telegram</span></a></li>
                     <li><a href="https://github.com/Unix-User" class="icon alt fa-github"><span class="label">GitHub</span></a></li>
-                    <li><a href="mailto:***REMOVED***@gmail.com" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
+                    <li><a href="mailto:wevertonslima@gmail.com" class="icon alt fa-envelope"><span class="label">Email</span></a></li>
                 </ul>
                 <ul class="copyright">
                     <li>&copy; RadiusMicroframework. All rights reserved.</li><li>Desenvolvido por: <a href="/">unix.local</a></li>
