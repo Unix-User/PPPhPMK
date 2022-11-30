@@ -31,7 +31,7 @@ Thank you for considering contributing to the framework.
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability, please send an e-mail to Weverton Lima via [***REMOVED***@gmail.com](mailto:***REMOVED***@gmail.com). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability, please send an e-mail to Weverton Lima via [wevertonslima@gmail.com](mailto:wevertonslima@gmail.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 

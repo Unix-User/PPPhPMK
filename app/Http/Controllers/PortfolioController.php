@@ -35,7 +35,7 @@ class PortfolioController extends Controller
             'category' => $request->category,
             'message' => $request->message
         );
-        Mail::to('***REMOVED***@gmail.com')->send(new Contact($data));
+        Mail::to('wevertonslima@gmail.com')->send(new Contact($data));
         return redirect()->back()->with('success', 'Email sent successfully!');
     }
 
