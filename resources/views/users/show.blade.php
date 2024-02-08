@@ -31,14 +31,14 @@
 <div class="card-deck">
     @if($user->contracts->count() > 0)
     <div class="card col-sm-4 bg-custom">
-        <a class="clean" href="/product/{{  $user->contracts->last()->product->id; }}/show">
+        <a class="clean" href="/product/{{  $user->contracts->last()->product->id }}/show">
             <div class="card-header">
                 <span class="icon alt fa-wifi"></span>
                 <strong class="text-capitalize">{{ $user->contracts->last()->product->name }}</strong>
             </div>
             <img class="card-img-top" src="/images/{{ $user->contracts->last()->product->image }}" alt="Card image cap">
             <div class="card-body">
-                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description; }}</p>
+                <p class="card-text text-truncate">{{ $user->contracts->last()->product->description }}</p>
                 <small class="float-left text-muted">Resp. técnico: {{ $user->contracts->last()->product->user->name }}</small>
             </div>
             <div class="card-footer">

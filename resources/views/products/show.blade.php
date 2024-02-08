@@ -12,7 +12,7 @@
 </header>
 <div class="card-deck">
     <div class="card col-sm-4 bg-custom">
-        <a class="clean" href="/product/{{  $product->id; }}/show">
+        <a class="clean" href="/product/{{  $product->id }}/show">
             <div class="card-header">
                 <span class="icon alt fa-wifi"></span>
                 <strong class="text-capitalize"> {{ $product->name }}</strong>
