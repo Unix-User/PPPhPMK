@@ -8,7 +8,6 @@ use App\Support\Collection;
 use App\Models\User;
 use PEAR2\Net\RouterOS;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use stdClass;
 use Exception;
@@ -69,10 +68,7 @@ class DeviceController extends Controller
             }
         }
         $detailed =  (new Collection($items))->paginate(3);
-        if (!isset($error)) {
-            return view('devices.index', compact('detailed'))->with('error', $error);
-        }
-        return view('devices.index', compact('detailed'));
+        return view('devices.index', compact('detailed'))->with('error', $error ?? null);
     }
 
     public function connect($id)
@@ -101,7 +97,7 @@ class DeviceController extends Controller
         ]);
 
         if (!$request->ikev2) {
-            $request->ikev2 = false;
+            $request->merge(['ikev2' => false]);
         }
 
         $device = new Device();
@@ -119,11 +115,11 @@ class DeviceController extends Controller
         $device = Device::find($id);
         $client = new RouterOS\Client($device->ip, $device->user, $device->password);
         $users = User::all();
-        $detailed = new stdClass();
+        $detailed = [];
         foreach ($users as $user) {
             if ((auth()->user()->id == 1) || ($user->contracts->last()->product->user->name == auth()->user()->name)) {
                 $query = RouterOS\Query::where('name', $user->name);
-                $details = $user;
+                $details = clone $user; // Clone the user object to avoid modifying the original
 
                 $requestData = new RouterOS\Request('/ppp secret print');
                 $requestData->setQuery($query);
@@ -138,10 +134,10 @@ class DeviceController extends Controller
                 $details->address = $status->getProperty('address');
                 $details->uptime = $status->getProperty('uptime');
 
-                $detailed->{$user->id} = $details;
-                $newUsers =  (new Collection($detailed))->paginate(10);
+                $detailed[] = $details;
             }
         }
+        $newUsers = (new Collection($detailed))->paginate(10);
         return view('devices.show', compact('device', 'newUsers'));
     }
 
@@ -161,7 +157,7 @@ class DeviceController extends Controller
         ]);
 
         if (!$request->ikev2) {
-            $request->ikev2 = false;
+            $request->merge(['ikev2' => false]);
         }
 
         $device = Device::find($id);
