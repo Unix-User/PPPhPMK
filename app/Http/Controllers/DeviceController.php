@@ -253,6 +253,7 @@ class DeviceController extends Controller
         $clientName = $device->name;
         try {
             $this->sshService->executeCommand("sudo ikev2.sh --addclient '{$clientName}'");
+            $this->sshService->disconnect();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao executar o comando SSH', 'message' => $e->getMessage()], 500);
         }
@@ -289,6 +290,7 @@ class DeviceController extends Controller
 
         try {
             $this->sshService->copyFile($remoteFilePath, $localFilePath);
+            $this->sshService->disconnect();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao processar o certificado', 'message' => $e->getMessage()], 500);
         }
