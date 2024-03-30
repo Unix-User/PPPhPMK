@@ -33,4 +33,9 @@ class SSHService
             throw new \Exception("File copy failed");
         }
     }
+    public function disconnect()
+    {
+        $this->ssh->disconnect();
+        $this->sftp->disconnect();
+    }
 }
