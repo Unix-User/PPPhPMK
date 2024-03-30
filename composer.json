@@ -16,7 +16,8 @@
         "nesbot/carbon": "^2.72",
         "pear2/cache_shm": "^0.2.0",
         "pear2/net_routeros": "dev-develop@dev",
-        "pear2/net_transmitter": "1.0.0b1"
+        "pear2/net_transmitter": "1.0.0b1",
+        "phpseclib/phpseclib": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.14",

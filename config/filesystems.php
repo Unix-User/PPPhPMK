@@ -38,7 +38,7 @@ return [
 
         'cert' => [
             'driver' => 'local',
-            'root' => base_path('../'),
+            'root' => storage_path('app/cert'),
         ],
 
         'public' => [
