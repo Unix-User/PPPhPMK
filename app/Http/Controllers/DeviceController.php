@@ -8,17 +8,20 @@ use App\Support\Collection;
 use App\Models\User;
 use PEAR2\Net\RouterOS;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
 use stdClass;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
-
+use App\Services\SSHService;
 
 class DeviceController extends Controller
 {
+    protected $sshService;
 
+    public function __construct(SSHService $sshService)
+    {
+        $this->sshService = $sshService;
+    }
     public function index()
     {
         $devices = Device::all();
@@ -237,73 +240,61 @@ class DeviceController extends Controller
         }
         return redirect()->back()->with('success', 'Sistema sincronizado com sucesso');
     }
-
     public function register($token)
     {
-        if ($token == null) {
-            return;
+        if (empty($token)) {
+            return response()->json(['error' => 'Token não fornecido'], 400);
         }
-        $device = Device::where('ikev2', $token)->first();
+        $device = Device::where('ikev2', $token)->firstOrFail();
+
         $device->ikev2 = Str::random(60);
         $device->save();
-        $script = null;
-        $ports = array(8728, 8729);
-        foreach ($ports as $port) {
-            $connection = @fsockopen($device->ip, $port, $errno, $errstr, 1);
-            if (!is_resource($connection)) {
-                $config = "conn $device->name" . PHP_EOL . "  rightid=@$device->name" . PHP_EOL . "  rightaddresspool=" . $device->ip . "-" . $device->ip . PHP_EOL . "  also=ikev2-cp" . PHP_EOL;
-                Storage::disk('local')->put($device->name . '.conf', $config);
-                $process = new Process(['sudo', '-u', 'www-data', 'sudo', 'systemctl', 'restart', 'ipsec.service',]);
-                $process->run();
-                $script = "/tool fetch url=https://" . $_SERVER['HTTP_HOST'] . "/api/cert/" . $device->ikev2 . " dst-path=" . $device->name . '.p12; :delay 4000ms;' . PHP_EOL;
-                $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
-                $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
-                $script .= "/ip ipsec mode-config add name=ike2-rw responder=no;" . PHP_EOL;
-                $script .= "/ip ipsec policy group add name=ike2-rw;" . PHP_EOL;
-                $script .= "/ip ipsec profile add name=ike2-rw;" . PHP_EOL;
-                $script .= "/ip ipsec peer add address=srv." . $_SERVER['HTTP_HOST'] . " exchange-mode=ike2 name=ike2-rw-client profile=ike2-rw;" . PHP_EOL;
-                $script .= "/ip ipsec proposal add name=ike2-rw pfs-group=none;" . PHP_EOL;
-                $script .= "/ip ipsec identity add auth-method=digital-signature certificate=$device->name.p12_1 generate-policy=port-strict mode-config=ike2-rw peer=ike2-rw-client policy-template-group=ike2-rw;" . PHP_EOL;
-                $script .= "/ip ipsec policy add group=ike2-rw proposal=ike2-rw template=yes" . PHP_EOL;
-            } else {
-                fclose($connection);
-            }
+
+        $clientName = $device->name;
+        try {
+            $this->sshService->executeCommand("sudo ikev2.sh --addclient '{$clientName}'");
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Falha ao executar o comando SSH', 'message' => $e->getMessage()], 500);
         }
-        return $script;
+
+        $script = "/tool fetch url=" . env('APP_URL') . "/api/cert/" . $device->ikev2 . " dst-path=" . $device->name . '.p12; :delay 4000ms;' . PHP_EOL;
+        $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
+        $script .= '/certificate import file-name=' . $device->name . '.p12 passphrase="";' . PHP_EOL;
+        $script .= "/ip ipsec mode-config add name=ike2-rw responder=no;" . PHP_EOL;
+        $script .= "/ip ipsec policy group add name=ike2-rw;" . PHP_EOL;
+        $script .= "/ip ipsec profile add name=ike2-rw;" . PHP_EOL;
+        $script .= "/ip ipsec peer add address=" . env('SSH_HOST') . " exchange-mode=ike2 name=ike2-rw-client profile=ike2-rw;" . PHP_EOL;
+        $script .= "/ip ipsec proposal add name=ike2-rw pfs-group=none;" . PHP_EOL;
+        $script .= "/ip ipsec identity add auth-method=digital-signature certificate=$device->name.p12_0 generate-policy=port-strict mode-config=ike2-rw peer=ike2-rw-client policy-template-group=ike2-rw;" . PHP_EOL;
+        $script .= "/ip ipsec policy add group=ike2-rw proposal=ike2-rw template=yes" . PHP_EOL;
+
+        // Modification starts here
+        $filename = "ispapp.rsc";
+        $headers = ['Content-Type' => 'text/plain'];
+        return response()->streamDownload(function() use ($script) {
+            echo $script;
+        }, $filename, $headers);
     }
 
     public function cert($token)
     {
-        if ($token == null) {
-            return;
+        if (empty($token)) {
+            return response()->json(['error' => 'Token não fornecido'], 400);
         }
-        $device = Device::where('ikev2', $token)->first();
-        $device->ikev2 = null;
-        $device->save();
+        $device = Device::where('ikev2', $token)->firstOrFail();
 
-        $process = new Process(['sudo', '-u', 'www-data', 'sudo', '/usr/bin/ikev2.sh', '--addclient', $device->name]);
-        $process->run();
+        $fileName = "{$device->name}.p12";
+        $remoteFilePath = "/home/" . env('SSH_USERNAME') . "/{$fileName}";
+        $localFilePath = Storage::disk('cert')->path($fileName);
 
-
-        if (!$process->isSuccessful()) {
-            $process = new Process(['sudo', '-u', 'www-data', 'sudo', '/usr/bin/ikev2.sh', '--exportclient', $device->name]);
-            $process->run();
-            $fileName = $device->name . '.p12';
-            //throw new ProcessFailedException($process);
+        try {
+            $this->sshService->copyFile($remoteFilePath, $localFilePath);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Falha ao processar o certificado', 'message' => $e->getMessage()], 500);
         }
-        $fileName = $device->name . '.p12';
 
-        if (!$fileName || !Storage::disk('cert')->exists($fileName)) {
-            abort(404);
-        }
-        return response()->stream(function () use ($fileName) {
-            $stream = Storage::disk('cert')->readStream($fileName);
-            fpassthru($stream);
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
-        }, 200, [
-            'Content-Disposition'   => 'attachment; filename="' . basename($fileName) . '"',
-        ]);
+        return response()->download($localFilePath, $fileName, ['Content-Type' => 'application/x-pkcs12'])->deleteFileAfterSend(true);
     }
 }
+
+
