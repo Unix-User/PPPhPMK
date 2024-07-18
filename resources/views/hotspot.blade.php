@@ -3,6 +3,18 @@
 <html lang="pt-br">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWZ100566B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-SWZ100566B');
+    </script>
     <title>Unix.Local</title>
     <meta charset="utf-8" />
     <!-- Bootstrap CSS -->
